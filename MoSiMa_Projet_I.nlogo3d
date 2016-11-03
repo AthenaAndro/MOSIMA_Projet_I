@@ -46,19 +46,18 @@ to setup
   clear-turtles
   clear-patches
 
-  create-turtles number-of-agent-type-One
-  [
-    set type-of-agent 1
+  RandAgent 0 nb-agents-0
+  RandAgent 1 nb-agents-1
+  RandAgent 2 nb-agents-2
+  RandAgent 3 nb-agents-3
+  RandAgent 4 nb-agents-4
+  RandAgent 5 nb-agents-5
+  RandAgent 6 nb-agents-6
+  RandAgent 7 nb-agents-7
+  RandAgent 8 nb-agents-8
+  RandAgent 9 nb-agents-9
 
-    set xcor random max-pxcor
-    set ycor random max-pycor
-
-    set direction (random 4) + 1      ;; + 1 pour coller aux valeurs de l'article
-
-    set heading (direction - 1) * 90  ;; - 1 pour coller aux valeurs de l'article
-
-    set color-type blue
-  ]
+  display-color
 
   reset-ticks
 end
@@ -99,7 +98,45 @@ to display-color
   ]
 end
 
-;; RandAgent
+;; RandMove
+;; ---
+;; Crée autant d'agents du type passé en argument que demandé
+;; • agent-type    : Type de l'agent
+;; • nb-agents     : Nombre d'agents de ce type à créer
+to RandAgent [agent-type nb-agents]
+  create-turtles nb-agents
+  [
+    set type-of-agent agent-type
+
+    set xcor random max-pxcor
+    set ycor random max-pycor
+
+    set direction (random 4) + 1      ;; + 1 pour coller aux valeurs de l'article
+
+    set heading (direction - 1) * 90  ;; - 1 pour coller aux valeurs de l'article
+
+    set-color-agent agent-type
+  ]
+end
+
+;; set-color-agent
+;; ---
+;; set la couleur de l'agent à la couleur qui lui correspond
+;; • agent-type    : Type de l'agent
+to set-color-agent [agent-type]
+  if agent-type = 0 [set color-type gray]
+  if agent-type = 1 [set color-type red]
+  if agent-type = 2 [set color-type orange]
+  if agent-type = 3 [set color-type brown]
+  if agent-type = 4 [set color-type yellow]
+  if agent-type = 5 [set color-type green]
+  if agent-type = 6 [set color-type cyan]
+  if agent-type = 7 [set color-type blue]
+  if agent-type = 8 [set color-type magenta]
+  if agent-type = 9 [set color-type pink]
+end
+
+;; RandMove
 ;; ---
 ;; Fait bouger un agent d'une case dans une direction aléatoire,
 ;; seulement si la case est libre
@@ -136,8 +173,8 @@ end
 GRAPHICS-WINDOW
 0
 0
-245
-70
+413
+434
 -1
 -1
 13.0
@@ -151,9 +188,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-2
+30
 0
-2
+30
 0
 0
 1
@@ -168,16 +205,16 @@ INPUTBOX
 172
 93
 number-of-agent-type-One
-2
+0
 1
 0
 Number
 
 BUTTON
-32
-191
-95
-224
+51
+354
+114
+387
 NIL
 setup
 NIL
@@ -191,10 +228,10 @@ NIL
 1
 
 BUTTON
-103
-191
-166
-224
+122
+354
+185
+387
 NIL
 go
 T
@@ -217,6 +254,116 @@ display-effort
 1
 1
 -1000
+
+INPUTBOX
+36
+114
+110
+174
+nb-agents-0
+10
+1
+0
+Number
+
+INPUTBOX
+36
+175
+110
+235
+nb-agents-1
+0
+1
+0
+Number
+
+INPUTBOX
+36
+237
+110
+297
+nb-agents-2
+0
+1
+0
+Number
+
+INPUTBOX
+117
+114
+190
+174
+nb-agents-3
+10
+1
+0
+Number
+
+INPUTBOX
+119
+176
+190
+236
+nb-agents-4
+0
+1
+0
+Number
+
+INPUTBOX
+119
+238
+191
+298
+nb-agents-5
+0
+1
+0
+Number
+
+INPUTBOX
+197
+114
+273
+174
+nb-agents-6
+0
+1
+0
+Number
+
+INPUTBOX
+197
+177
+273
+237
+nb-agents-7
+0
+1
+0
+Number
+
+INPUTBOX
+197
+238
+273
+298
+nb-agents-8
+0
+1
+0
+Number
+
+INPUTBOX
+277
+114
+349
+174
+nb-agents-9
+0
+1
+0
+Number
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -561,7 +708,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3.1
+NetLogo 3D 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
