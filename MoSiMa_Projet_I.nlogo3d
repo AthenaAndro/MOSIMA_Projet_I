@@ -45,6 +45,7 @@ turtles-own [
 to setup
   clear-turtles
   clear-patches
+  clear-all-plots
 
   RandAgent 0 nb-agents-0
   RandAgent 1 nb-agents-1
@@ -108,14 +109,17 @@ to RandAgent [agent-type nb-agents]
   [
     set type-of-agent agent-type
 
-    set xcor random max-pxcor
-    set ycor random max-pycor
+    ;; Récupération d'un patch non-occupé sur lequel positionner la turtle
+    let patch-to-go one-of patches with [not any? turtles-on self]
+    set xcor [pxcor] of patch-to-go
+    set ycor [pycor] of patch-to-go
 
     set direction (random 4) + 1      ;; + 1 pour coller aux valeurs de l'article
 
     set heading (direction - 1) * 90  ;; - 1 pour coller aux valeurs de l'article
 
     set-color-agent agent-type
+    set-effort-agent agent-type
   ]
 end
 
@@ -134,6 +138,10 @@ to set-color-agent [agent-type]
   if agent-type = 7 [set color-type blue]
   if agent-type = 8 [set color-type magenta]
   if agent-type = 9 [set color-type pink]
+end
+
+to set-effort-agent [agent-type]
+  set effort random 100
 end
 
 ;; RandMove
@@ -327,7 +335,7 @@ INPUTBOX
 273
 174
 nb-agents-6
-0
+10
 1
 0
 Number
@@ -360,10 +368,47 @@ INPUTBOX
 349
 174
 nb-agents-9
-0
+10
 1
 0
 Number
+
+PLOT
+389
+12
+589
+162
+Moyenne et Ecart-type Effort
+time
+effort
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"Moyenne effort" 1.0 0 -2674135 true "" "plot mean [effort] of turtles"
+"Ecart-Type " 1.0 0 -16777216 true "" "plot standard-deviation [effort] of turtles"
+
+PLOT
+389
+169
+589
+319
+Profit
+time
+profit
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot mean [effort] of turtles"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -708,7 +753,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3
+NetLogo 3D 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
