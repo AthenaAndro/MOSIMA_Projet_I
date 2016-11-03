@@ -84,22 +84,24 @@ end
 ;; Affiche la couleur en fonction de l'effort fournit
 ;; ou en fonction du type des agents
 to display-color
-  ifelse display-effort
+  if display-effort
   [
-    ask turtles
+    ask patches
     [
-      set color color-effort
+      if any? turtles-here
+      [
+        set pcolor [color-effort] of one-of turtles-here
+        show "turtle here"
+      ]
     ]
   ]
+  ask turtles
   [
-    ask turtles
-    [
-      set color color-type
-    ]
+    set color color-type
   ]
 end
 
-;; RandMove
+;; RandAgent
 ;; ---
 ;; Crée autant d'agents du type passé en argument que demandé
 ;; • agent-type    : Type de l'agent
@@ -140,8 +142,21 @@ to set-color-agent [agent-type]
   if agent-type = 9 [set color-type pink]
 end
 
+;; set-effort-agent
+;; ---
+;; set de départ de l'effort de l'agent selon son type
+;; • agent-type    : Type de l'agent
 to set-effort-agent [agent-type]
-  set effort random 100
+  if agent-type = 0 [set effort 0]
+  if agent-type = 1 [set effort Random 100]
+  if agent-type = 2 [set effort Random 100]
+  if agent-type = 3 [set effort Random 100]
+  if agent-type = 4 [set effort Random 100]
+  if agent-type = 5 [set effort 100]
+  if agent-type = 6 [set effort Random 100]
+  if agent-type = 7 [set effort 100]
+  if agent-type = 8 [set effort Random 100]
+  if agent-type = 9 [set effort Random 100]
 end
 
 ;; RandMove
@@ -280,7 +295,7 @@ INPUTBOX
 110
 235
 nb-agents-1
-0
+10
 1
 0
 Number
@@ -302,7 +317,7 @@ INPUTBOX
 190
 174
 nb-agents-3
-10
+0
 1
 0
 Number
@@ -313,7 +328,7 @@ INPUTBOX
 190
 236
 nb-agents-4
-0
+10
 1
 0
 Number
@@ -346,7 +361,7 @@ INPUTBOX
 273
 237
 nb-agents-7
-0
+10
 1
 0
 Number
@@ -368,7 +383,7 @@ INPUTBOX
 349
 174
 nb-agents-9
-10
+0
 1
 0
 Number
@@ -409,6 +424,17 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot mean [effort] of turtles"
+
+MONITOR
+301
+220
+379
+265
+nb-agents
+count turtles
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
