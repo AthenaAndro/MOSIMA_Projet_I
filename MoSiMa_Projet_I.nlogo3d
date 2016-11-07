@@ -111,10 +111,8 @@ to RandAgent [agent-type nb-agents]
   [
     set type-of-agent agent-type
 
-    ;; Récupération d'un patch non-occupé sur lequel positionner la turtle
-    let patch-to-go one-of patches with [not any? turtles-on self]
-    set xcor [pxcor] of patch-to-go
-    set ycor [pycor] of patch-to-go
+    ;; Placement sur un patch non-occupé sur lequel positionner la turtle
+    move-to one-of patches with [not any? turtles-on self]
 
     set direction (random 4) + 1      ;; + 1 pour coller aux valeurs de l'article
 
@@ -424,17 +422,6 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot mean [effort] of turtles"
-
-MONITOR
-301
-220
-379
-265
-nb-agents
-count turtles
-17
-1
-11
 
 @#$#@#$#@
 ## WHAT IS IT?
