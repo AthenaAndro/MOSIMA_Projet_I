@@ -73,6 +73,7 @@ to go
   [
     let partenaire partner
     if partenaire != nobody [ show partenaire ]
+    update-color-effort
   ]
 
   display-color
@@ -81,17 +82,19 @@ end
 
 ;; display-color
 ;; ---
-;; Affiche la couleur en fonction de l'effort fournit
+;; Affiche la couleur en fonction de l'effort fourni
 ;; ou en fonction du type des agents
 to display-color
   if display-effort
   [
     ask patches
     [
-      if any? turtles-here
+      ifelse any? turtles-here
       [
         set pcolor [color-effort] of one-of turtles-here
-        show "turtle here"
+      ]
+      [
+        set pcolor black
       ]
     ]
   ]
@@ -110,6 +113,7 @@ to RandAgent [agent-type nb-agents]
   create-turtles nb-agents
   [
     set type-of-agent agent-type
+    ;;set shape "square"
 
     ;; Placement sur un patch non-occupé sur lequel positionner la turtle
     move-to one-of patches with [not any? turtles-on self]
@@ -118,16 +122,17 @@ to RandAgent [agent-type nb-agents]
 
     set heading (direction - 1) * 90  ;; - 1 pour coller aux valeurs de l'article
 
-    set-color-agent agent-type
-    set-effort-agent agent-type
+    setup-color-agent agent-type
+    setup-effort-agent agent-type
+    update-color-effort
   ]
 end
 
-;; set-color-agent
+;; setup-color-agent
 ;; ---
 ;; set la couleur de l'agent à la couleur qui lui correspond
 ;; • agent-type    : Type de l'agent
-to set-color-agent [agent-type]
+to setup-color-agent [agent-type]
   if agent-type = 0 [set color-type gray]
   if agent-type = 1 [set color-type red]
   if agent-type = 2 [set color-type orange]
@@ -140,11 +145,11 @@ to set-color-agent [agent-type]
   if agent-type = 9 [set color-type pink]
 end
 
-;; set-effort-agent
+;; setup-effort-agent
 ;; ---
 ;; set de départ de l'effort de l'agent selon son type
 ;; • agent-type    : Type de l'agent
-to set-effort-agent [agent-type]
+to setup-effort-agent [agent-type]
   if agent-type = 0 [set effort 0]
   if agent-type = 1 [set effort Random 100]
   if agent-type = 2 [set effort Random 100]
@@ -155,6 +160,13 @@ to set-effort-agent [agent-type]
   if agent-type = 7 [set effort 100]
   if agent-type = 8 [set effort Random 100]
   if agent-type = 9 [set effort Random 100]
+end
+
+;; update-color-effort
+;; ---
+;; Met à jour la couleur de l'effort de l'agent
+to update-color-effort
+  set color-effort floor ((100 - effort) / 10) * 10 + 15
 end
 
 ;; RandMove
@@ -272,7 +284,7 @@ SWITCH
 74
 display-effort
 display-effort
-1
+0
 1
 -1000
 
@@ -304,7 +316,7 @@ INPUTBOX
 110
 297
 nb-agents-2
-0
+10
 1
 0
 Number
@@ -315,7 +327,7 @@ INPUTBOX
 190
 174
 nb-agents-3
-0
+10
 1
 0
 Number
@@ -337,7 +349,7 @@ INPUTBOX
 191
 298
 nb-agents-5
-0
+10
 1
 0
 Number
@@ -370,7 +382,7 @@ INPUTBOX
 273
 298
 nb-agents-8
-0
+10
 1
 0
 Number
@@ -381,16 +393,16 @@ INPUTBOX
 349
 174
 nb-agents-9
-0
+10
 1
 0
 Number
 
 PLOT
-389
-12
-589
-162
+594
+10
+1138
+160
 Moyenne et Ecart-type Effort
 time
 effort
@@ -399,7 +411,7 @@ effort
 0.0
 10.0
 true
-false
+true
 "" ""
 PENS
 "Moyenne effort" 1.0 0 -2674135 true "" "plot mean [effort] of turtles"
@@ -422,6 +434,33 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot mean [effort] of turtles"
+
+PLOT
+594
+168
+1137
+475
+Moyenne effort selon type d'agent
+time
+effort
+0.0
+10.0
+0.0
+100.0
+true
+true
+"" ""
+PENS
+"null effort" 1.0 0 -7500403 true "" "plot mean [effort] of turtles with [type-of-agent = 0]"
+"shrinking effort" 1.0 0 -2674135 true "" "plot mean [effort] of turtles with [type-of-agent = 1]"
+"replicator" 1.0 0 -955883 true "" "plot mean [effort] of turtles with [type-of-agent = 2]"
+"rational" 1.0 0 -6459832 true "" "plot mean [effort] of turtles with [type-of-agent = 3]"
+"profit comparator" 1.0 0 -1184463 true "" "plot mean [effort] of turtles with [type-of-agent = 4]"
+"high effort" 1.0 0 -10899396 true "" "plot mean [effort] of turtles with [type-of-agent = 5]"
+"average rational" 1.0 0 -13840069 true "" "plot mean [effort] of turtles with [type-of-agent = 6]"
+"pen-7" 1.0 0 -14835848 true "" "plot mean [effort] of turtles with [type-of-agent = 7]"
+"pen-8" 1.0 0 -11221820 true "" "plot mean [effort] of turtles with [type-of-agent = 8]"
+"pen-9" 1.0 0 -13791810 true "" "plot mean [effort] of turtles with [type-of-agent = 9]"
 
 @#$#@#$#@
 ## WHAT IS IT?
