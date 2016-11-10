@@ -1,7 +1,7 @@
 turtles-own [
   ;; Variables des agents
   ;; ---
-  ;; • type-of-agent    : Type de l'agent
+  ;; • agent-type       : Type de l'agent
   ;; • direction        : Direction vers laquelle l'agent regarde
   ;; • step             : "allowed motion" (?)
   ;; • color-effort     : Couleur de l'effort
@@ -21,7 +21,7 @@ turtles-own [
   ;; • a-profit         : Dernier profit du partenaire de l'agent
   ;; • n-effort         : Le profit moyen des voisins de l'agent
 
-  type-of-agent
+  agent-type
   direction
   step
   color-effort
@@ -107,12 +107,12 @@ end
 ;; RandAgent
 ;; ---
 ;; Crée autant d'agents du type passé en argument que demandé
-;; • agent-type    : Type de l'agent
+;; • type-agent    : Type de l'agent
 ;; • nb-agents     : Nombre d'agents de ce type à créer
-to RandAgent [agent-type nb-agents]
+to RandAgent [type-agent nb-agents]
   create-turtles nb-agents
   [
-    set type-of-agent agent-type
+    set agent-type type-agent
     ;;set shape "square"
 
     ;; Placement sur un patch non-occupé sur lequel positionner la turtle
@@ -122,8 +122,8 @@ to RandAgent [agent-type nb-agents]
 
     set heading (direction - 1) * 90  ;; - 1 pour coller aux valeurs de l'article
 
-    setup-color-agent agent-type
-    setup-effort-agent agent-type
+    setup-color-agent
+    setup-effort-agent
     update-color-effort
   ]
 end
@@ -131,8 +131,7 @@ end
 ;; setup-color-agent
 ;; ---
 ;; set la couleur de l'agent à la couleur qui lui correspond
-;; • agent-type    : Type de l'agent
-to setup-color-agent [agent-type]
+to setup-color-agent
   if agent-type = 0 [set color-type gray]
   if agent-type = 1 [set color-type red]
   if agent-type = 2 [set color-type orange]
@@ -148,8 +147,7 @@ end
 ;; setup-effort-agent
 ;; ---
 ;; set de départ de l'effort de l'agent selon son type
-;; • agent-type    : Type de l'agent
-to setup-effort-agent [agent-type]
+to setup-effort-agent
   if agent-type = 0 [set effort 0]
   if agent-type = 1 [set effort Random 100]
   if agent-type = 2 [set effort Random 100]
@@ -174,10 +172,10 @@ end
 ;; Fait bouger un agent d'une case dans une direction aléatoire,
 ;; seulement si la case est libre
 to RandMove
-  set direction random 4
+  RandDir
   set heading direction * 90
 
-  if empty? sort turtles-on patch-ahead 1 [ fd 1 ]
+  if not any? turtles-on patch-ahead 1 [ fd 1 ]
 end
 
 ;; partner
@@ -201,6 +199,7 @@ to WorkAgent [parteff]
 end
 
 to RandDir
+  set direction random 4
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -451,16 +450,16 @@ true
 true
 "" ""
 PENS
-"null effort" 1.0 0 -7500403 true "" "plot mean [effort] of turtles with [type-of-agent = 0]"
-"shrinking effort" 1.0 0 -2674135 true "" "plot mean [effort] of turtles with [type-of-agent = 1]"
-"replicator" 1.0 0 -955883 true "" "plot mean [effort] of turtles with [type-of-agent = 2]"
-"rational" 1.0 0 -6459832 true "" "plot mean [effort] of turtles with [type-of-agent = 3]"
-"profit comparator" 1.0 0 -1184463 true "" "plot mean [effort] of turtles with [type-of-agent = 4]"
-"high effort" 1.0 0 -10899396 true "" "plot mean [effort] of turtles with [type-of-agent = 5]"
-"average rational" 1.0 0 -13840069 true "" "plot mean [effort] of turtles with [type-of-agent = 6]"
-"pen-7" 1.0 0 -14835848 true "" "plot mean [effort] of turtles with [type-of-agent = 7]"
-"pen-8" 1.0 0 -11221820 true "" "plot mean [effort] of turtles with [type-of-agent = 8]"
-"pen-9" 1.0 0 -13791810 true "" "plot mean [effort] of turtles with [type-of-agent = 9]"
+"null effort" 1.0 0 -7500403 true "" "plot mean [effort] of turtles with [agent-type = 0]"
+"shrinking effort" 1.0 0 -2674135 true "" "plot mean [effort] of turtles with [agent-type = 1]"
+"replicator" 1.0 0 -955883 true "" "plot mean [effort] of turtles with [agent-type = 2]"
+"rational" 1.0 0 -6459832 true "" "plot mean [effort] of turtles with [agent-type = 3]"
+"profit comparator" 1.0 0 -1184463 true "" "plot mean [effort] of turtles with [agent-type = 4]"
+"high effort" 1.0 0 -10899396 true "" "plot mean [effort] of turtles with [agent-type = 5]"
+"average rational" 1.0 0 -13840069 true "" "plot mean [effort] of turtles with [agent-type = 6]"
+"winner imitator" 1.0 0 -14835848 true "" "plot mean [effort] of turtles with [agent-type = 7]"
+"effort comparator" 1.0 0 -11221820 true "" "plot mean [effort] of turtles with [agent-type = 8]"
+"averager" 1.0 0 -13791810 true "" "plot mean [effort] of turtles with [agent-type = 9]"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -805,7 +804,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3.1
+NetLogo 3D 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
