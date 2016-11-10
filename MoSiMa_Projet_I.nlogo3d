@@ -3,23 +3,23 @@ turtles-own [
   ;; ---
   ;; • agent-type       : Type de l'agent
   ;; • direction        : Direction vers laquelle l'agent regarde
-  ;; • step             : "allowed motion" (?)
+  ;; • step             : "allowed motion"
   ;; • color-effort     : Couleur de l'effort
   ;; • color-type       : Couleur du type
   ;; • evol             : Type d'évolution que l'agent à atteint (?)
   ;; • numinc           : nombre d'itérations
   ;;
   ;; • effort           : L'effort de l'agent
-  ;; • cumulated-effort : L'effort cumulé du partenaire
-  ;; • last-effort      : Dernier effort fourni par l'agent
-  ;; • a-effort         : Dernier effort fourni par le partenaire de l'agent
-  ;; • n-effort         : L'effort moyen fourni par les voisins de l'agent
+  ;; • cumeffort        : L'effort cumulé du partenaire
+  ;; • leffort      : Dernier effort fourni par l'agent
+  ;; • aeffort         : Dernier effort fourni par le partenaire de l'agent
+  ;; • neffort         : L'effort moyen fourni par les voisins de l'agent
   ;;
   ;; • profit           : Le profit de l'agent
-  ;; • cumulated-profit : Le perofit cumulé du partenaire
-  ;; • last-profit      : Dernier profit de l'agent
-  ;; • a-profit         : Dernier profit du partenaire de l'agent
-  ;; • n-effort         : Le profit moyen des voisins de l'agent
+  ;; • cumprof          : Le perofit cumulé du partenaire
+  ;; • lprofit      : Dernier profit de l'agent
+  ;; • aprofit         : Dernier profit du partenaire de l'agent
+  ;; • nprofit         : Le profit moyen des voisins de l'agent
 
   agent-type
   direction
@@ -30,16 +30,16 @@ turtles-own [
   numinc
 
   effort
-  cumulated-effort
-  last-effort
-  a-effort
-  n-effort
+  cumeffort
+  leffort
+  aeffort
+  neffort
 
   profit
-  cumulated-profit
-  last-profit
-  a-profit
-  n-profit
+  cumprof
+  lprofit
+  aprofit
+  nprofit
 ]
 
 to setup
@@ -72,7 +72,7 @@ to go
   ask turtles
   [
     let partenaire partner
-    if partenaire != nobody [ show partenaire ]
+    if partenaire != nobody [ WorkAgent [effort] of partenaire ]
     update-color-effort
   ]
 
@@ -98,10 +98,12 @@ to display-color
       ]
     ]
   ]
-  ask turtles
-  [
-    set color color-type
-  ]
+
+  ;; Inutile car les agents ne changent pas de type pendant la simulation...
+;  ask turtles
+;  [
+;    set color color-type
+;  ]
 end
 
 ;; RandAgent
@@ -118,9 +120,15 @@ to RandAgent [type-agent nb-agents]
     ;; Placement sur un patch non-occupé sur lequel positionner la turtle
     move-to one-of patches with [not any? turtles-on self]
 
-    set direction (random 4) + 1      ;; + 1 pour coller aux valeurs de l'article
+    ;; Choix de la direction et positionnement en conséquence
+    RandDir
+    set heading direction * 90
 
-    set heading (direction - 1) * 90  ;; - 1 pour coller aux valeurs de l'article
+    set step allowed-step
+    set numinc 0
+    set profit 0
+    set cumprof 0
+    set cumeffort 0
 
     setup-color-agent
     setup-effort-agent
@@ -158,6 +166,9 @@ to setup-effort-agent
   if agent-type = 7 [set effort 100]
   if agent-type = 8 [set effort Random 100]
   if agent-type = 9 [set effort Random 100]
+
+  ;; On règle arbitrairement l'effort précédent sur l'effort courant à l'initialisation...
+  set leffort effort
 end
 
 ;; update-color-effort
@@ -175,7 +186,7 @@ to RandMove
   RandDir
   set heading direction * 90
 
-  if not any? turtles-on patch-ahead 1 [ fd 1 ]
+  if not any? turtles-on patch-ahead step [ fd step ]
 end
 
 ;; partner
@@ -183,7 +194,7 @@ end
 ;; Renvoie l'agent qui lui fait face, s'il y en a un
 ;; Sinon renvoie nobody
 to-report partner
-  foreach sort turtles-on patch-ahead 1
+  foreach sort turtles-on patch-ahead 1 ;; TODO : 1 ou step ???
   [
     let other-direction [direction] of ?
     if other-direction != direction and other-direction mod 2 = direction mod 2
@@ -195,7 +206,41 @@ to-report partner
   report nobody
 end
 
+;; WorkAgent
+;; ---
+;; Détermine l'effort et la réaction d'un agent lorsqu'il rencontre un autre agent
+;; • parteff : effort fourni par le partenaire
 to WorkAgent [parteff]
+  ;; Incrément du nombre d'intéraction
+  set numinc numinc + 1
+
+  ;; Mise à jour des variables en fonction de l'effort du partenaire
+  set profit (5 * sqrt (effort + parteff) - effort ^ 2)
+  set cumprof cumprof + profit
+  set aeffort parteff
+  set cumeffort cumeffort + aeffort
+  set aprofit (5 * sqrt (effort + parteff) - aeffort ^ 2)
+  set leffort effort
+
+  ;; Mise à jour de l'effort selon le type d'agent
+  if agent-type = 1 [ set effort parteff / 2 ]
+  if agent-type = 2 [ set effort parteff ]
+  if agent-type = 3 [  ] ;; TODO
+  if agent-type = 4 [
+    ifelse profit > aprofit [ set effort effort * 1.1 ]
+    [ set effort effort * 0.9 ]
+  ]
+  if agent-type = 6 [  ] ;; TODO
+  if agent-type = 7 [
+    if profit < aprofit [ set effort aeffort ]
+  ]
+  if agent-type = 8 [
+    ifelse effort < aeffort [ set effort effort * 1.1 ]
+    [ set effort effort * 0.9 ]
+  ]
+  if agent-type = 9 [ set effort mean (list effort aeffort) ]
+
+
 end
 
 to RandDir
@@ -432,7 +477,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot mean [effort] of turtles"
+"Profit" 1.0 0 -16777216 true "" "plot mean [profit] of turtles"
 
 PLOT
 594
@@ -460,6 +505,21 @@ PENS
 "winner imitator" 1.0 0 -14835848 true "" "plot mean [effort] of turtles with [agent-type = 7]"
 "effort comparator" 1.0 0 -11221820 true "" "plot mean [effort] of turtles with [agent-type = 8]"
 "averager" 1.0 0 -13791810 true "" "plot mean [effort] of turtles with [agent-type = 9]"
+
+SLIDER
+375
+39
+547
+72
+allowed-step
+allowed-step
+0
+10
+1
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
