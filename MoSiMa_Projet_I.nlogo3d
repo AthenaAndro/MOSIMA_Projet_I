@@ -72,7 +72,8 @@ to go
   ask turtles
   [
     let partenaire partner
-    if partenaire != nobody [ WorkAgent [effort] of partenaire ]
+    if partenaire != nobody [
+      WorkAgent [effort] of partenaire ]
     update-color-effort
   ]
 
@@ -112,13 +113,15 @@ end
 ;; • type-agent    : Type de l'agent
 ;; • nb-agents     : Nombre d'agents de ce type à créer
 to RandAgent [type-agent nb-agents]
-  create-turtles nb-agents
+  ;; on cherche le min pour créer exactement ce qu'il faut
+  create-turtles min (list (count patches with [not any? turtles-on self]) nb-agents )
   [
     set agent-type type-agent
     ;;set shape "square"
 
     ;; Placement sur un patch non-occupé sur lequel positionner la turtle
-    move-to one-of patches with [not any? turtles-on self]
+    let partenaire one-of patches with [not any? turtles-on self]
+    if partenaire != nobody [move-to partenaire]
 
     ;; Choix de la direction et positionnement en conséquence
     RandDir
@@ -140,16 +143,16 @@ end
 ;; ---
 ;; set la couleur de l'agent à la couleur qui lui correspond
 to setup-color-agent
-  if agent-type = 0 [set color-type gray]
-  if agent-type = 1 [set color-type red]
-  if agent-type = 2 [set color-type orange]
-  if agent-type = 3 [set color-type brown]
-  if agent-type = 4 [set color-type yellow]
-  if agent-type = 5 [set color-type green]
-  if agent-type = 6 [set color-type cyan]
-  if agent-type = 7 [set color-type blue]
-  if agent-type = 8 [set color-type magenta]
-  if agent-type = 9 [set color-type pink]
+  if agent-type = 0 [set color-type gray set color color-type]
+  if agent-type = 1 [set color-type red set color color-type]
+  if agent-type = 2 [set color-type orange set color color-type]
+  if agent-type = 3 [set color-type brown set color color-type]
+  if agent-type = 4 [set color-type yellow set color color-type]
+  if agent-type = 5 [set color-type green set color color-type]
+  if agent-type = 6 [set color-type cyan set color color-type]
+  if agent-type = 7 [set color-type blue set color color-type]
+  if agent-type = 8 [set color-type magenta set color color-type]
+  if agent-type = 9 [set color-type pink set color color-type]
 end
 
 ;; setup-effort-agent
@@ -194,13 +197,14 @@ end
 ;; Renvoie l'agent qui lui fait face, s'il y en a un
 ;; Sinon renvoie nobody
 to-report partner
-  foreach sort turtles-on patch-ahead 1 ;; TODO : 1 ou step ???
+  let part one-of turtles-on patch-ahead 1
+
+  if part = nobody [report nobody]
+
+  let other-direction [direction] of part
+  if other-direction != direction and other-direction mod 2 = direction mod 2
   [
-    let other-direction [direction] of ?
-    if other-direction != direction and other-direction mod 2 = direction mod 2
-    [
-      report ?
-    ]
+    report part
   ]
 
   report nobody
@@ -338,7 +342,7 @@ INPUTBOX
 110
 174
 nb-agents-0
-10
+955
 1
 0
 Number
@@ -349,7 +353,7 @@ INPUTBOX
 110
 235
 nb-agents-1
-10
+0
 1
 0
 Number
@@ -360,7 +364,7 @@ INPUTBOX
 110
 297
 nb-agents-2
-10
+0
 1
 0
 Number
@@ -371,7 +375,7 @@ INPUTBOX
 190
 174
 nb-agents-3
-10
+0
 1
 0
 Number
@@ -382,7 +386,7 @@ INPUTBOX
 190
 236
 nb-agents-4
-10
+0
 1
 0
 Number
@@ -393,7 +397,7 @@ INPUTBOX
 191
 298
 nb-agents-5
-10
+6
 1
 0
 Number
@@ -404,7 +408,7 @@ INPUTBOX
 273
 174
 nb-agents-6
-10
+0
 1
 0
 Number
@@ -415,7 +419,7 @@ INPUTBOX
 273
 237
 nb-agents-7
-10
+0
 1
 0
 Number
@@ -426,7 +430,7 @@ INPUTBOX
 273
 298
 nb-agents-8
-10
+0
 1
 0
 Number
@@ -437,7 +441,7 @@ INPUTBOX
 349
 174
 nb-agents-9
-10
+0
 1
 0
 Number
@@ -495,16 +499,16 @@ true
 true
 "" ""
 PENS
-"null effort" 1.0 0 -7500403 true "" "plot mean [effort] of turtles with [agent-type = 0]"
-"shrinking effort" 1.0 0 -2674135 true "" "plot mean [effort] of turtles with [agent-type = 1]"
-"replicator" 1.0 0 -955883 true "" "plot mean [effort] of turtles with [agent-type = 2]"
-"rational" 1.0 0 -6459832 true "" "plot mean [effort] of turtles with [agent-type = 3]"
-"profit comparator" 1.0 0 -1184463 true "" "plot mean [effort] of turtles with [agent-type = 4]"
-"high effort" 1.0 0 -10899396 true "" "plot mean [effort] of turtles with [agent-type = 5]"
-"average rational" 1.0 0 -13840069 true "" "plot mean [effort] of turtles with [agent-type = 6]"
-"winner imitator" 1.0 0 -14835848 true "" "plot mean [effort] of turtles with [agent-type = 7]"
-"effort comparator" 1.0 0 -11221820 true "" "plot mean [effort] of turtles with [agent-type = 8]"
-"averager" 1.0 0 -13791810 true "" "plot mean [effort] of turtles with [agent-type = 9]"
+"null effort" 1.0 0 -7500403 true "" "if nb-agents-0 > 0 [plot mean [effort] of turtles with [agent-type = 0]]"
+"shrinking effort" 1.0 0 -2674135 true "" "if nb-agents-1 > 0 [plot mean [effort] of turtles with [agent-type = 1]]"
+"replicator" 1.0 0 -955883 true "" "if nb-agents-2 > 0 [plot mean [effort] of turtles with [agent-type = 2]]"
+"rational" 1.0 0 -6459832 true "" "if nb-agents-3 > 0 [plot mean [effort] of turtles with [agent-type = 3]]"
+"profit comparator" 1.0 0 -1184463 true "" "if nb-agents-4 > 0 [plot mean [effort] of turtles with [agent-type = 4]]"
+"high effort" 1.0 0 -10899396 true "" "if nb-agents-5 > 0 [plot mean [effort] of turtles with [agent-type = 5]]"
+"average rational" 1.0 0 -13840069 true "" "if nb-agents-6 > 0 [plot mean [effort] of turtles with [agent-type = 6]]"
+"winner imitator" 1.0 0 -14835848 true "" "if nb-agents-7 > 0 [plot mean [effort] of turtles with [agent-type = 7]]"
+"effort comparator" 1.0 0 -11221820 true "" "if nb-agents-8 > 0 [plot mean [effort] of turtles with [agent-type = 8]]"
+"averager" 1.0 0 -13791810 true "" "if nb-agents-9 > 0 [plot mean [effort] of turtles with [agent-type = 9]]"
 
 SLIDER
 375
