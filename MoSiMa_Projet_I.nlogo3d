@@ -42,10 +42,19 @@ turtles-own [
   nprofit
 ]
 
+;; Variables globales
+globals [
+  effort-min
+  effort-max
+]
+
 to setup
   clear-turtles
   clear-patches
   clear-all-plots
+
+  set effort-min 0.0001
+  set effort-max 2.001
 
   RandAgent 0 nb-agents-0
   RandAgent 1 nb-agents-1
@@ -120,8 +129,8 @@ to RandAgent [type-agent nb-agents]
     ;;set shape "square"
 
     ;; Placement sur un patch non-occupé sur lequel positionner la turtle
-    let partenaire one-of patches with [not any? turtles-on self]
-    if partenaire != nobody [move-to partenaire]
+    let place one-of patches with [not any? turtles-on self]
+    if place != nobody [move-to place]
 
     ;; Choix de la direction et positionnement en conséquence
     RandDir
@@ -159,16 +168,16 @@ end
 ;; ---
 ;; set de départ de l'effort de l'agent selon son type
 to setup-effort-agent
-  if agent-type = 0 [set effort 0]
-  if agent-type = 1 [set effort Random 100]
-  if agent-type = 2 [set effort Random 100]
-  if agent-type = 3 [set effort Random 100]
-  if agent-type = 4 [set effort Random 100]
-  if agent-type = 5 [set effort 100]
-  if agent-type = 6 [set effort Random 100]
-  if agent-type = 7 [set effort 100]
-  if agent-type = 8 [set effort Random 100]
-  if agent-type = 9 [set effort Random 100]
+  if agent-type = 0 [set effort effort-min]
+  if agent-type = 1 [set effort random-float (effort-max - effort-min) + effort-min]
+  if agent-type = 2 [set effort random-float (effort-max - effort-min) + effort-min]
+  if agent-type = 3 [set effort random-float (effort-max - effort-min) + effort-min]
+  if agent-type = 4 [set effort random-float (effort-max - effort-min) + effort-min]
+  if agent-type = 5 [set effort effort-max]
+  if agent-type = 6 [set effort random-float (effort-max - effort-min) + effort-min]
+  if agent-type = 7 [set effort effort-max]
+  if agent-type = 8 [set effort random-float (effort-max - effort-min) + effort-min]
+  if agent-type = 9 [set effort random-float (effort-max - effort-min) + effort-min]
 
   ;; On règle arbitrairement l'effort précédent sur l'effort courant à l'initialisation...
   set leffort effort
@@ -178,7 +187,8 @@ end
 ;; ---
 ;; Met à jour la couleur de l'effort de l'agent
 to update-color-effort
-  set color-effort floor ((100 - effort) / 10) * 10 + 15
+  let temp effort * 100 / effort-max
+  set color-effort floor ((100 - temp) / 10) * 10 + 15
 end
 
 ;; RandMove
@@ -216,11 +226,11 @@ end
 ;; • parteff : effort fourni par le partenaire
 to WorkAgent [parteff]
   ;; Incrément du nombre d'intéraction
-  set numinc numinc + 1
+  set numinc (numinc + 1)
 
   ;; Mise à jour des variables en fonction de l'effort du partenaire
   set profit (5 * sqrt (effort + parteff) - effort ^ 2)
-  set cumprof cumprof + profit
+  set cumprof (cumprof + profit)
   set aeffort parteff
   set cumeffort cumeffort + aeffort
   set aprofit (5 * sqrt (effort + parteff) - aeffort ^ 2)
@@ -229,26 +239,42 @@ to WorkAgent [parteff]
   ;; Mise à jour de l'effort selon le type d'agent
   if agent-type = 1 [ set effort parteff / 2 ]
   if agent-type = 2 [ set effort parteff ]
-  if agent-type = 3 [  ] ;; TODO
+  if agent-type = 3 [ set effort best-reply parteff ]
   if agent-type = 4 [
-    ifelse profit > aprofit [ set effort effort * 1.1 ]
-    [ set effort effort * 0.9 ]
+    ifelse profit > aprofit [ set effort min (list (effort * 1.1) effort-max) ]
+    [ set effort max (list (effort * 0.9) effort-min) ]
   ]
-  if agent-type = 6 [  ] ;; TODO
+  if agent-type = 6 [ set effort best-reply (cumeffort / numinc) ]
   if agent-type = 7 [
     if profit < aprofit [ set effort aeffort ]
   ]
   if agent-type = 8 [
-    ifelse effort < aeffort [ set effort effort * 1.1 ]
-    [ set effort effort * 0.9 ]
+    ifelse effort < aeffort [ set effort min (list (effort * 1.1) effort-max) ]
+    [ set effort max (list (effort * 0.9) effort-min) ]
   ]
   if agent-type = 9 [ set effort mean (list effort aeffort) ]
 
 
 end
 
+;; RandDir
+;; ---
+;; Renvoie une direction aléatoire à suivre
 to RandDir
   set direction random 4
+end
+
+;; TODO : Pose problème pour certaines valeurs de parteff...
+;; best-reply
+;; ---
+;; Renvoie la meilleure réponse (i.e. qui maximise le profit) à l'effort passé en paramètres
+;; • parteff : effort fourni par le partenaire (ou moyenne d'efforts)
+to-report best-reply [parteff]
+  ;; Initialisation des variables nécessaires au calcul
+  let q ((parteff ^ 3) * 2 / 27 - 25 / 16)
+  let delta (625 / 1024 - 25 / 432 * parteff ^ 3)
+
+  report (- q / 2 + (sqrt delta)) ^ (1 / 3) + (- q / 2 - (sqrt delta)) ^ (1 / 3) - parteff / 3
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -342,7 +368,7 @@ INPUTBOX
 110
 174
 nb-agents-0
-955
+1
 1
 0
 Number
@@ -397,7 +423,7 @@ INPUTBOX
 191
 298
 nb-agents-5
-6
+1
 1
 0
 Number
@@ -419,7 +445,7 @@ INPUTBOX
 273
 237
 nb-agents-7
-0
+800
 1
 0
 Number
@@ -457,7 +483,7 @@ effort
 0.0
 10.0
 0.0
-10.0
+2.002
 true
 true
 "" ""
@@ -494,7 +520,7 @@ effort
 0.0
 10.0
 0.0
-100.0
+2.002
 true
 true
 "" ""
@@ -868,7 +894,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3
+NetLogo 3D 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
