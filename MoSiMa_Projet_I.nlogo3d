@@ -245,7 +245,15 @@ to WorkAgent [parteff]
   ;; Mise à jour de l'effort selon le type d'agent
   if agent-type = 1 [ set effort aeffort / 2 ]
   if agent-type = 2 [ set effort aeffort ]
-  if agent-type = 3 [ set effort best-reply aeffort ]
+  if agent-type = 3
+  [
+    set effort best-reply aeffort
+    ;; Newton se fait la plupart du temps en moins de 20 itérations,
+    ;; pour un profit très proche du best-reply deterministe, parfoit même meilleur
+    ;let tmp best-reply-newton aeffort
+    ;show (list effort aeffort (calculate-profit effort aeffort) (calculate-profit first tmp aeffort) last tmp )
+    ]
+
   if agent-type = 4 [
     ifelse profit > aprofit [ set effort min (list (effort * 1.1) effort-max) ]
     [ set effort max (list (effort * 0.9) effort-min) ]
@@ -316,6 +324,272 @@ to-report best-reply [parteff]
   ]
 
   report max-reply
+end
+
+;; best-reply-newton
+;; ---
+;; Utilise la méthode de Newton
+;; Renvoie la meilleure réponse (i.e. qui maximise le profit) à l'effort passé en paramètres
+;; • parteff : effort fourni par le partenaire (ou moyenne d'efforts)
+to-report best-reply-newton [parteff]
+  let x_k-1 0
+  let x_k 0.5
+  let delta_k 0
+  let counter 0
+  while [ abs (x_k - x_k-1) > 0.00001 and counter < 10000 ]
+  [
+    set delta_k calculate-derivee x_k parteff / calculate-derivee-second x_k parteff
+    set x_k-1 x_k
+    set x_k x_k - delta_k
+    set counter counter + 1
+  ]
+  report (list x_k counter)
+end
+
+;; calculate-derivee
+;; ---
+;; Calcule la fonction que l'on essaie d'annuler, fonction obtenue
+;; à partir de la dérivée de la fonction de profit
+;; • effort  : effort fourni par l'agent
+;; • parteff : effort fourni par le partenaire (ou moyenne d'efforts)
+to-report calculate-derivee [eff parteff]
+  report effort ^ 3 + eff ^ 2 * parteff - 25 / 16
+end
+
+;; calculate-derivee-second
+;; ---
+;; Calcule la dérivée de la fonction que l'on essaie d'annuler, fonction obtenue
+;; à partir de la dérivée de la fonction de profit
+;; • effort  : effort fourni par l'agent
+;; • parteff : effort fourni par le partenaire (ou moyenne d'efforts)
+to-report calculate-derivee-second [eff parteff]
+  report 3 * eff ^ 2 + 2 * eff * parteff
+end
+
+;; do-plotting
+;; ---
+;; Plot un graphique selon la liste fournie
+;; • nom      : nom du graphe où l'on veut plot les courbes
+;; • liste    : Liste des points à afficher, qui doit être sous la forme :
+;;              Une liste de courbe, chacune composée :
+;;              -- Du nom de la courbe et d'une liste de couple, chacun représentant
+;;              -- -- x et y, les coordonnées des points à afficher, dans l'ordre
+;;              ------------------------------- Exemple -------------------------
+;;              ( ( "moyenne" ((x1 y1) (x2 y2)) ) ( "ecart" ((z1 t1) (z2 t2)) ) )
+;;              do-plotting "test" (list (list "null effort" (list (list 1 1 ) (list 2 3 ) )))
+to do-plotting [ nom liste ]
+  set-current-plot nom
+  foreach liste
+  [
+    set-current-plot-pen first ?
+    foreach last ? [ plotxy first ? last ? ]
+    ;; Les points sont trop petits...
+    ;set-current-plot-pen (word first ? " point")
+    ;foreach last ? [ plotxy first ? last ? ]
+  ]
+end
+
+;; simulate
+;; ---
+;; Lance une batterie de simulation
+to simulate
+
+  let liste-plot-null []
+  let liste-plot-shrinking []
+  let liste-plot-replicator []
+  let liste-plot-profit []
+  let liste-plot-imitator []
+  let liste-plot-effort []
+  let liste-plot-averager []
+
+  let counter 0
+  let tampon []
+
+  foreach (list 0.6 5.6 33.3 66.7 100)
+  [
+    let pourcentage ?
+    ;; null effort
+    setup-simulate (list (961 - floor (961 * pourcentage / 100 )) ;; null effort
+                         0
+                         0
+                         0
+                         0
+                         (floor (961 * pourcentage / 100 ))       ;; high effort
+                         0
+                         0
+                         0
+                         0 )
+
+    core-simulate
+
+    set liste-plot-null lput (list ? (mean [effort] of turtles) ) liste-plot-null
+
+    ;; shrinking effort
+    setup-simulate (list 0
+                         (961 - floor (961 * pourcentage / 100 )) ;; shrinking effort
+                         0
+                         0
+                         0
+                         (floor (961 * pourcentage / 100 ))       ;; high effort
+                         0
+                         0
+                         0
+                         0 )
+
+    core-simulate
+
+    set liste-plot-shrinking lput (list ? (mean [effort] of turtles) ) liste-plot-shrinking
+
+    ;; replicator
+    setup-simulate (list 0
+                         0
+                         (961 - floor (961 * pourcentage / 100 )) ;; replicator
+                         0
+                         0
+                         (floor (961 * pourcentage / 100 ))       ;; high effort
+                         0
+                         0
+                         0
+                         0 )
+
+    core-simulate
+
+    set liste-plot-replicator lput (list ? (mean [effort] of turtles) ) liste-plot-replicator
+
+    ;; profit comparator
+    setup-simulate (list 0
+                         0
+                         0
+                         0
+                         (961 - floor (961 * pourcentage / 100 )) ;; profit comparator
+                         (floor (961 * pourcentage / 100 ))       ;; high effort
+                         0
+                         0
+                         0
+                         0 )
+
+
+    core-simulate
+
+    set liste-plot-profit lput (list ? (mean [effort] of turtles) ) liste-plot-profit
+
+    ;; winner imitator
+    setup-simulate (list 0
+                         0
+                         0
+                         0
+                         0
+                         (floor (961 * pourcentage / 100 ))       ;; high effort
+                         0
+                         (961 - floor (961 * pourcentage / 100 )) ;; winner imitator
+                         0
+                         0 )
+
+    core-simulate
+
+    set liste-plot-imitator lput (list ? (mean [effort] of turtles) ) liste-plot-imitator
+
+    ;; effort comparator
+    setup-simulate (list 0
+                         0
+                         0
+                         0
+                         0
+                         (floor (961 * pourcentage / 100 ))       ;; high effort
+                         0
+                         0
+                         (961 - floor (961 * pourcentage / 100 )) ;; effort comparator
+                         0 )
+
+    core-simulate
+
+    set liste-plot-effort lput (list ? (mean [effort] of turtles) ) liste-plot-effort
+
+    ;; averager
+    setup-simulate (list 0
+                         0
+                         0
+                         0
+                         0
+                         (floor (961 * pourcentage / 100 ))         ;; high effort
+                         0
+                         0
+                         0
+                         (961 - floor (961 * pourcentage / 100 )) ) ;; average
+
+    core-simulate
+
+    set liste-plot-averager lput (list ? (mean [effort] of turtles) ) liste-plot-averager
+  ]
+
+  let liste-plot (list (list "null effort" liste-plot-null)
+                       (list "shrinking effort" liste-plot-shrinking)
+                       (list "replicator" liste-plot-replicator)
+                       (list "profit comparator" liste-plot-profit)
+                       (list "winner imitator" liste-plot-imitator)
+                       (list "effort comparator" liste-plot-effort)
+                       (list "averager" liste-plot-averager) )
+
+  do-plotting "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort" liste-plot
+end
+
+to core-simulate
+  let counter 0
+  let tampon (list (mean [effort] of turtles) )
+  ;; • Au moins 200 itération
+  ;; • Tant que la moyenne de la moyenne des efforts des agents durant 200 dernières itérations
+  ;; • est supérieure à 0.1
+  ;; • Au plus 50 000 itérations
+  while [ (counter < 200 or standard-deviation tampon > 0.1) and counter < 25000 ]
+    [
+    go-simulate
+    ifelse counter > 200
+    [
+      set tampon lput (mean [effort] of turtles) tampon
+    ]
+    [
+      set tampon remove 0 (lput (mean [effort] of turtles) tampon)
+    ]
+    set counter counter + 1
+  ]
+
+    show (word "Nombre d'itération " counter)
+end
+
+to setup-simulate [ liste ]
+  clear-turtles
+  clear-patches
+  set-current-plot "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
+  clear-plot
+
+  set effort-min 0.0001
+  set effort-max 2.001
+
+  RandAgent 0 item 0 liste
+  RandAgent 1 item 1 liste
+  RandAgent 2 item 2 liste
+  RandAgent 3 item 3 liste
+  RandAgent 4 item 4 liste
+  RandAgent 5 item 5 liste
+  RandAgent 6 item 6 liste
+  RandAgent 7 item 7 liste
+  RandAgent 8 item 8 liste
+  RandAgent 9 item 9 liste
+end
+
+to go-simulate
+  ask turtles
+  [
+    RandMove
+  ]
+
+  ask turtles
+  [
+    let partenaire partner
+    if partenaire != nobody [
+      WorkAgent [effort] of partenaire ]
+    update-color-effort
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -431,7 +705,7 @@ INPUTBOX
 110
 297
 nb-agents-2
-0
+960
 1
 0
 Number
@@ -442,7 +716,7 @@ INPUTBOX
 190
 174
 nb-agents-3
-0
+1
 1
 0
 Number
@@ -464,7 +738,7 @@ INPUTBOX
 191
 298
 nb-agents-5
-450
+0
 1
 0
 Number
@@ -497,7 +771,7 @@ INPUTBOX
 273
 298
 nb-agents-8
-511
+0
 1
 0
 Number
@@ -599,7 +873,7 @@ SWITCH
 130
 noise?
 noise?
-0
+1
 1
 -1000
 
@@ -639,6 +913,47 @@ mean [effort] of turtles
 5
 1
 11
+
+PLOT
+595
+481
+1137
+766
+Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort
+Pourcentage d'agents high effort
+Effort Moyen
+0.0
+100.0
+0.0
+2.002
+true
+true
+"" ""
+PENS
+"null effort" 1.0 0 -7500403 true "" ""
+"shrinking effort" 1.0 0 -2674135 true "" ""
+"replicator" 1.0 0 -955883 true "" ""
+"profit comparator" 1.0 0 -1184463 true "" ""
+"winner imitator" 1.0 0 -14835848 true "" ""
+"effort comparator" 1.0 0 -11221820 true "" ""
+"averager" 1.0 0 -13345367 true "" ""
+
+BUTTON
+51
+392
+128
+425
+NIL
+simulate
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
