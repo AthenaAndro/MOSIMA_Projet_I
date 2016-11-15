@@ -803,7 +803,7 @@ INPUTBOX
 281
 191
 nb-agents-5
-50
+0
 1
 0
 Number
@@ -825,7 +825,7 @@ INPUTBOX
 278
 384
 nb-agents-7
-0
+961
 1
 0
 Number
@@ -836,7 +836,7 @@ INPUTBOX
 278
 486
 nb-agents-8
-911
+0
 1
 0
 Number
@@ -938,7 +938,7 @@ SWITCH
 340
 noise?
 noise?
-1
+0
 1
 -1000
 
@@ -951,10 +951,10 @@ noise-value
 noise-value
 1
 50
-46
 1
 1
-NIL
+1
+%
 HORIZONTAL
 
 MONITOR
