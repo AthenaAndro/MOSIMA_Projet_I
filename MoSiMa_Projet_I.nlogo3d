@@ -255,7 +255,7 @@ to WorkAgent [parteff]
     ]
 
   if agent-type = 4 [
-    ifelse profit > aprofit [ set effort min (list (effort * 1.1) effort-max) ]
+    ifelse profit > aprofit [ set effort effort * 1.1 ]; set effort min (list (effort * 1.1) effort-max) ]
     [ set effort max (list (effort * 0.9) effort-min) ]
   ]
   if agent-type = 6 [ set effort best-reply (cumeffort / numinc) ]
@@ -263,7 +263,7 @@ to WorkAgent [parteff]
     if profit < aprofit [ set effort aeffort ]
   ]
   if agent-type = 8 [
-    ifelse effort < aeffort [ set effort min (list (effort * 1.1) effort-max) ]
+    ifelse effort < aeffort [ set effort effort * 1.1 ]; set effort min (list (effort * 1.1) effort-max) ]
     [ set effort max (list (effort * 0.9) effort-min) ]
   ]
   if agent-type = 9 [ set effort mean (list effort aeffort) ]
@@ -389,11 +389,11 @@ to do-plotting [ nom liste ]
   ]
 end
 
-;; simulate
+;; simulate-fig6
 ;; ---
-;; Lance une batterie de simulation
-to simulate
-
+;; Lance une batterie de simulation pour créer un plot des résultats similaires à la figure 6 de l'article
+to simulate-fig6
+  ;; Initialisation des listes stockant les valeurs à afficher
   let liste-plot-null []
   let liste-plot-shrinking []
   let liste-plot-replicator []
@@ -402,57 +402,59 @@ to simulate
   let liste-plot-effort []
   let liste-plot-averager []
 
+  ;; Initialisation de variables temporaires
   let counter 0
   let tampon []
 
+  ;; Boucle lançant la simulation pour chaque proportion de high effort voulue pour chaque type d'agent
   foreach (list 0.6 5.6 33.3 66.7 100)
   [
     let pourcentage ?
     ;; null effort
-    setup-simulate (list (961 - floor (961 * pourcentage / 100 )) ;; null effort
+    setup-simulate (list (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; null effort
                          0
                          0
                          0
                          0
-                         (floor (961 * pourcentage / 100 ))       ;; high effort
+                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
                          0
                          0
                          0
                          0 )
 
-    core-simulate
+    core-simulate 0
 
     set liste-plot-null lput (list ? (mean [effort] of turtles) ) liste-plot-null
 
     ;; shrinking effort
     setup-simulate (list 0
-                         (961 - floor (961 * pourcentage / 100 )) ;; shrinking effort
+                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; shrinking effort
                          0
                          0
                          0
-                         (floor (961 * pourcentage / 100 ))       ;; high effort
+                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
                          0
                          0
                          0
                          0 )
 
-    core-simulate
+    core-simulate 1
 
     set liste-plot-shrinking lput (list ? (mean [effort] of turtles) ) liste-plot-shrinking
 
     ;; replicator
     setup-simulate (list 0
                          0
-                         (961 - floor (961 * pourcentage / 100 )) ;; replicator
+                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; replicator
                          0
                          0
-                         (floor (961 * pourcentage / 100 ))       ;; high effort
+                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
                          0
                          0
                          0
                          0 )
 
-    core-simulate
+    core-simulate 2
 
     set liste-plot-replicator lput (list ? (mean [effort] of turtles) ) liste-plot-replicator
 
@@ -461,15 +463,15 @@ to simulate
                          0
                          0
                          0
-                         (961 - floor (961 * pourcentage / 100 )) ;; profit comparator
-                         (floor (961 * pourcentage / 100 ))       ;; high effort
+                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; profit comparator
+                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
                          0
                          0
                          0
                          0 )
 
 
-    core-simulate
+    core-simulate 4
 
     set liste-plot-profit lput (list ? (mean [effort] of turtles) ) liste-plot-profit
 
@@ -479,13 +481,13 @@ to simulate
                          0
                          0
                          0
-                         (floor (961 * pourcentage / 100 ))       ;; high effort
+                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
                          0
-                         (961 - floor (961 * pourcentage / 100 )) ;; winner imitator
+                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; winner imitator
                          0
                          0 )
 
-    core-simulate
+    core-simulate 7
 
     set liste-plot-imitator lput (list ? (mean [effort] of turtles) ) liste-plot-imitator
 
@@ -495,13 +497,13 @@ to simulate
                          0
                          0
                          0
-                         (floor (961 * pourcentage / 100 ))       ;; high effort
+                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
                          0
                          0
-                         (961 - floor (961 * pourcentage / 100 )) ;; effort comparator
+                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; effort comparator
                          0 )
 
-    core-simulate
+    core-simulate 8
 
     set liste-plot-effort lput (list ? (mean [effort] of turtles) ) liste-plot-effort
 
@@ -511,13 +513,13 @@ to simulate
                          0
                          0
                          0
-                         (floor (961 * pourcentage / 100 ))         ;; high effort
+                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))         ;; high effort
                          0
                          0
                          0
-                         (961 - floor (961 * pourcentage / 100 )) ) ;; average
+                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ) ;; average
 
-    core-simulate
+    core-simulate 9
 
     set liste-plot-averager lput (list ? (mean [effort] of turtles) ) liste-plot-averager
   ]
@@ -530,30 +532,39 @@ to simulate
                        (list "effort comparator" liste-plot-effort)
                        (list "averager" liste-plot-averager) )
 
+  ;; Affiche le plot voulu
   do-plotting "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort" liste-plot
 end
 
-to core-simulate
+;; core-simulate
+;; ---
+;; Effectue la simulation tant que l'écart-type des 200 dernières itérations n'est pas inférieur à la précision voulue : ecart-type-max
+;; • type-agent : type d'agent qui nous intéresse et qui va être
+to core-simulate [ type-agent ]
   let counter 0
-  let tampon (list (mean [effort] of turtles) )
-  ;; • Au moins 200 itération
-  ;; • Tant que la moyenne de la moyenne des efforts des agents durant 200 dernières itérations
-  ;; • est supérieure à 0.1
-  ;; • Au plus 50 000 itérations
-  while [ (counter < 200 or standard-deviation tampon > 0.1) and counter < 25000 ]
+  if count turtles with [agent-type = type-agent] > 0
+  [
+    let tampon (list (mean [effort] of turtles with [agent-type = type-agent]) )
+    ;; • Au moins min-nb-iterations itération
+    ;; • Tant que la moyenne de la moyenne des efforts des agents durant min-nb-iterations dernières itérations
+    ;; • est supérieure à ecart-type-max
+    ;; • Au plus max-nb-iterations itérations
+    while [ (counter < min-nb-iterations or standard-deviation tampon > ecart-type-max) and counter < max-nb-iterations ]
     [
-    go-simulate
-    ifelse counter > 200
-    [
-      set tampon lput (mean [effort] of turtles) tampon
+      go-simulate
+      ifelse counter > min-nb-iterations
+      [
+        set tampon lput (mean [effort] of turtles with [agent-type = type-agent]) tampon
+      ]
+      [
+        set tampon remove 0 (lput (mean [effort] of turtles with [agent-type = type-agent]) tampon)
+      ]
+      set counter counter + 1
     ]
-    [
-      set tampon remove 0 (lput (mean [effort] of turtles) tampon)
-    ]
-    set counter counter + 1
-  ]
 
+    show (sentence "Simulation sur des agents de type " type-agent " avec " (count turtles with [agent-type = 5] / count turtles) )
     show (word "Nombre d'itération " counter)
+  ]
 end
 
 to setup-simulate [ liste ]
@@ -621,22 +632,11 @@ GRAPHICS-WINDOW
 ticks
 30.0
 
-INPUTBOX
-32
-33
-172
-93
-number-of-agent-type-One
-0
-1
-0
-Number
-
 BUTTON
-51
-354
-114
-387
+33
+630
+96
+663
 NIL
 setup
 NIL
@@ -650,10 +650,10 @@ NIL
 1
 
 BUTTON
-122
-354
-185
-387
+104
+630
+167
+663
 NIL
 go
 T
@@ -667,21 +667,21 @@ NIL
 1
 
 SWITCH
-225
-41
-356
-74
+367
+87
+498
+120
 display-effort
 display-effort
-0
+1
 1
 -1000
 
 INPUTBOX
-36
-114
-110
-174
+22
+132
+122
+192
 nb-agents-0
 0
 1
@@ -689,10 +689,10 @@ nb-agents-0
 Number
 
 INPUTBOX
-36
-175
-110
-235
+20
+227
+120
+287
 nb-agents-1
 0
 1
@@ -700,32 +700,32 @@ nb-agents-1
 Number
 
 INPUTBOX
-36
-237
-110
-297
-nb-agents-2
-960
-1
-0
-Number
-
-INPUTBOX
-117
-114
-190
-174
-nb-agents-3
-1
-1
-0
-Number
-
-INPUTBOX
+19
+325
 119
-176
-190
-236
+385
+nb-agents-2
+0
+1
+0
+Number
+
+INPUTBOX
+18
+427
+118
+487
+nb-agents-3
+0
+1
+0
+Number
+
+INPUTBOX
+19
+529
+118
+589
 nb-agents-4
 0
 1
@@ -733,21 +733,21 @@ nb-agents-4
 Number
 
 INPUTBOX
-119
-238
+181
+131
+281
 191
-298
 nb-agents-5
-0
+200
 1
 0
 Number
 
 INPUTBOX
-197
-114
-273
-174
+179
+225
+279
+285
 nb-agents-6
 0
 1
@@ -755,10 +755,10 @@ nb-agents-6
 Number
 
 INPUTBOX
-197
-177
-273
-237
+179
+324
+278
+384
 nb-agents-7
 0
 1
@@ -766,21 +766,21 @@ nb-agents-7
 Number
 
 INPUTBOX
-197
-238
-273
-298
+178
+426
+278
+486
 nb-agents-8
-0
+400
 1
 0
 Number
 
 INPUTBOX
-277
-114
-349
-174
+178
+527
+279
+587
 nb-agents-9
 0
 1
@@ -788,11 +788,11 @@ nb-agents-9
 Number
 
 PLOT
-594
-10
-1138
-160
-Moyenne et Ecart-type Effort
+590
+53
+1134
+203
+Moyenne et Ecart-type Effort global
 time
 effort
 0.0
@@ -807,10 +807,10 @@ PENS
 "Ecart-Type " 1.0 0 -16777216 true "" "plot standard-deviation [effort] of turtles"
 
 PLOT
-390
-323
-590
-473
+382
+677
+582
+827
 Profit Moyen
 time
 profit
@@ -825,10 +825,10 @@ PENS
 "Profit" 1.0 0 -16777216 true "" "plot mean [profit] of turtles"
 
 PLOT
-594
-168
-1137
-475
+590
+211
+1133
+518
 Moyenne effort selon type d'agent
 time
 effort
@@ -846,16 +846,16 @@ PENS
 "rational" 1.0 0 -6459832 true "" "if nb-agents-3 > 0 [plot mean [effort] of turtles with [agent-type = 3]]"
 "profit comparator" 1.0 0 -1184463 true "" "if nb-agents-4 > 0 [plot mean [effort] of turtles with [agent-type = 4]]"
 "high effort" 1.0 0 -10899396 true "" "if nb-agents-5 > 0 [plot mean [effort] of turtles with [agent-type = 5]]"
-"average rational" 1.0 0 -13840069 true "" "if nb-agents-6 > 0 [plot mean [effort] of turtles with [agent-type = 6]]"
-"winner imitator" 1.0 0 -14835848 true "" "if nb-agents-7 > 0 [plot mean [effort] of turtles with [agent-type = 7]]"
-"effort comparator" 1.0 0 -11221820 true "" "if nb-agents-8 > 0 [plot mean [effort] of turtles with [agent-type = 8]]"
-"averager" 1.0 0 -13791810 true "" "if nb-agents-9 > 0 [plot mean [effort] of turtles with [agent-type = 9]]"
+"average rational" 1.0 0 -11221820 true "" "if nb-agents-6 > 0 [plot mean [effort] of turtles with [agent-type = 6]]"
+"winner imitator" 1.0 0 -13345367 true "" "if nb-agents-7 > 0 [plot mean [effort] of turtles with [agent-type = 7]]"
+"effort comparator" 1.0 0 -5825686 true "" "if nb-agents-8 > 0 [plot mean [effort] of turtles with [agent-type = 8]]"
+"averager" 1.0 0 -2064490 true "" "if nb-agents-9 > 0 [plot mean [effort] of turtles with [agent-type = 9]]"
 
 SLIDER
-375
-39
-547
-72
+367
+133
+539
+166
 allowed-step
 allowed-step
 0
@@ -867,10 +867,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-390
-97
-493
-130
+361
+307
+464
+340
 noise?
 noise?
 1
@@ -878,10 +878,10 @@ noise?
 -1000
 
 SLIDER
+361
+357
+533
 390
-147
-562
-180
 noise-value
 noise-value
 1
@@ -893,10 +893,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-499
-274
-589
-319
+360
+628
+461
+673
 Profit Moyen
 mean [profit] of turtles
 5
@@ -904,21 +904,21 @@ mean [profit] of turtles
 11
 
 MONITOR
-389
-273
-481
-318
-Effort Moyen
+459
+444
+576
+489
+Moyenne Effort
 mean [effort] of turtles
 5
 1
 11
 
 PLOT
-595
-481
-1137
-766
+25
+976
+782
+1449
 Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort
 Pourcentage d'agents high effort
 Effort Moyen
@@ -934,17 +934,17 @@ PENS
 "shrinking effort" 1.0 0 -2674135 true "" ""
 "replicator" 1.0 0 -955883 true "" ""
 "profit comparator" 1.0 0 -1184463 true "" ""
-"winner imitator" 1.0 0 -14835848 true "" ""
-"effort comparator" 1.0 0 -11221820 true "" ""
-"averager" 1.0 0 -13345367 true "" ""
+"winner imitator" 1.0 0 -13345367 true "" ""
+"effort comparator" 1.0 0 -5825686 true "" ""
+"averager" 1.0 0 -2064490 true "" ""
 
 BUTTON
-51
-392
-128
-425
-NIL
-simulate
+25
+936
+112
+969
+figure 6
+simulate-fig6
 NIL
 1
 T
@@ -954,6 +954,277 @@ NIL
 NIL
 NIL
 1
+
+TEXTBOX
+28
+832
+178
+854
+Simulations
+18
+0.0
+1
+
+PLOT
+589
+520
+1133
+827
+Ecart-type effort selon type d'agent
+time
+ecart-type
+0.0
+10.0
+0.0
+2.002
+true
+true
+"" ""
+PENS
+"null effort" 1.0 0 -7500403 true "" "if nb-agents-0 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 0] ]"
+"shrinking effort" 1.0 0 -2674135 true "" "if nb-agents-1 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 1] ]"
+"replicator" 1.0 0 -955883 true "" "if nb-agents-2 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 2] ]"
+"rational" 1.0 0 -6459832 true "" "if nb-agents-3 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 3] ]"
+"profit comparator" 1.0 0 -1184463 true "" "if nb-agents-4 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 4] ]"
+"high effort" 1.0 0 -10899396 true "" "if nb-agents-5 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 5] ]"
+"average rational" 1.0 0 -11221820 true "" "if nb-agents-6 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 6] ]"
+"winner imitator" 1.0 0 -13345367 true "" "if nb-agents-7 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 7] ]"
+"effort comparator" 1.0 0 -5825686 true "" "if nb-agents-8 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 8] ]"
+"averager" 1.0 0 -2064490 true "" "if nb-agents-9 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 9] ]"
+
+TEXTBOX
+588
+23
+738
+45
+Statistiques
+18
+0.0
+1
+
+TEXTBOX
+26
+6
+176
+28
+Paramètres
+18
+0.0
+1
+
+TEXTBOX
+24
+39
+174
+77
+Nombre d'agents de chaque type
+16
+0.0
+1
+
+TEXTBOX
+368
+58
+518
+77
+Divers
+16
+0.0
+1
+
+TEXTBOX
+368
+274
+518
+293
+Bruit
+16
+0.0
+1
+
+PLOT
+1146
+52
+1720
+568
+Affichage des efforts
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"set-plot-x-range -1 (max-pxcor + 1)\nset-plot-y-range -1 (max-pycor + 1)\ncreate-temporary-plot-pen \"effort\"\nset-plot-pen-mode 2" "clear-plot\nset-plot-x-range -1 (max-pxcor + 1)\nset-plot-y-range -1 (max-pycor + 1)\ncreate-temporary-plot-pen \"effort\"\nset-plot-pen-mode 2\nask turtles\n[\nset-plot-pen-color color-effort\nset pen-size 10\nplotxy xcor ycor\n]"
+PENS
+
+TEXTBOX
+26
+109
+176
+127
+null effort
+12
+0.0
+1
+
+TEXTBOX
+21
+209
+171
+227
+shrinking effort
+12
+0.0
+1
+
+TEXTBOX
+22
+308
+172
+326
+replicator
+12
+0.0
+1
+
+TEXTBOX
+22
+412
+172
+430
+rational
+12
+0.0
+1
+
+TEXTBOX
+25
+512
+175
+530
+profit comparator
+12
+0.0
+1
+
+TEXTBOX
+181
+109
+331
+127
+high effort
+12
+0.0
+1
+
+TEXTBOX
+180
+206
+330
+224
+average rational
+12
+0.0
+1
+
+TEXTBOX
+180
+306
+330
+324
+winner imitator
+12
+0.0
+1
+
+TEXTBOX
+181
+411
+331
+429
+effort comparator
+12
+0.0
+1
+
+TEXTBOX
+177
+508
+327
+526
+averager
+12
+0.0
+1
+
+MONITOR
+460
+510
+579
+555
+Ecart-type Effort
+standard-deviation [effort] of turtles
+5
+1
+11
+
+MONITOR
+465
+628
+583
+673
+Ecart-type Profit
+standard-deviation [profit] of turtles
+5
+1
+11
+
+SLIDER
+25
+871
+204
+904
+min-nb-iterations
+min-nb-iterations
+10
+1000
+200
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+214
+871
+396
+904
+max-nb-iterations
+max-nb-iterations
+500
+50000
+50000
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+405
+871
+577
+904
+ecart-type-max
+ecart-type-max
+0.01
+0.5
+0.1
+0.01
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1298,7 +1569,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3.1
+NetLogo 3D 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
