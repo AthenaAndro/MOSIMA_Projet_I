@@ -379,9 +379,13 @@ end
 ;;              do-plotting "test" (list (list "null effort" (list (list 1 1 ) (list 2 3 ) )))
 to do-plotting [ nom liste ]
   set-current-plot nom
+  let counter 0
   foreach liste
   [
-    set-current-plot-pen first ?
+    create-temporary-plot-pen first ?
+;    set-current-plot-pen first ?
+    set-plot-pen-color 5 + counter * 10
+    set counter counter + 1
     foreach last ? [ plotxy first ? last ? ]
     ;; Les points sont trop petits...
     ;set-current-plot-pen (word first ? " point")
@@ -420,9 +424,9 @@ to simulate-fig6
                          0
                          0
                          0
-                         0 )
+                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
 
-    core-simulate 0
+    core-simulate
 
     set liste-plot-null lput (list ? (mean [effort] of turtles) ) liste-plot-null
 
@@ -436,9 +440,9 @@ to simulate-fig6
                          0
                          0
                          0
-                         0 )
+                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
 
-    core-simulate 1
+    core-simulate
 
     set liste-plot-shrinking lput (list ? (mean [effort] of turtles) ) liste-plot-shrinking
 
@@ -452,9 +456,9 @@ to simulate-fig6
                          0
                          0
                          0
-                         0 )
+                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
 
-    core-simulate 2
+    core-simulate
 
     set liste-plot-replicator lput (list ? (mean [effort] of turtles) ) liste-plot-replicator
 
@@ -468,10 +472,10 @@ to simulate-fig6
                          0
                          0
                          0
-                         0 )
+                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
 
 
-    core-simulate 4
+    core-simulate
 
     set liste-plot-profit lput (list ? (mean [effort] of turtles) ) liste-plot-profit
 
@@ -485,9 +489,9 @@ to simulate-fig6
                          0
                          (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; winner imitator
                          0
-                         0 )
+                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
 
-    core-simulate 7
+    core-simulate
 
     set liste-plot-imitator lput (list ? (mean [effort] of turtles) ) liste-plot-imitator
 
@@ -501,9 +505,9 @@ to simulate-fig6
                          0
                          0
                          (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; effort comparator
-                         0 )
+                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
 
-    core-simulate 8
+    core-simulate
 
     set liste-plot-effort lput (list ? (mean [effort] of turtles) ) liste-plot-effort
 
@@ -518,8 +522,9 @@ to simulate-fig6
                          0
                          0
                          (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ) ;; average
+                         "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
 
-    core-simulate 9
+    core-simulate
 
     set liste-plot-averager lput (list ? (mean [effort] of turtles) ) liste-plot-averager
   ]
@@ -536,41 +541,101 @@ to simulate-fig6
   do-plotting "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort" liste-plot
 end
 
+
+;; simulate-fig7
+;; ---
+;; Lance une batterie de simulation pour créer un plot des résultats similaires à la figure 7 de l'article
+to simulate-fig7
+  ;; Initialisation des listes stockant les valeurs à afficher
+  let liste-plot-expected (list (list 0 0.92101) (list 0.6 0.92701) (list 5.6 0.98101)  (list 33.3 1.28100)  (list 66.7 1.64100) (list 100 2.00100) )
+  let liste-plot-rational []
+  let liste-plot-average-rational []
+
+  ;; Initialisation de variables temporaires
+  let counter 0
+  let tampon []
+
+  ;; Boucle lançant la simulation pour chaque proportion de high effort voulue pour chaque type d'agent
+  foreach (list 0.6 5.6 33.3 66.7 100)
+  [
+    let pourcentage ?
+    ;; rational
+    setup-simulate (list 0
+                         0
+                         0
+                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; rational
+                         0
+                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
+                         0
+                         0
+                         0
+                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
+
+    core-simulate
+
+    set liste-plot-rational lput (list ? (mean [effort] of turtles) ) liste-plot-rational
+
+    ;; average-rational
+    setup-simulate (list 0
+                         0
+                         0
+                         0
+                         0
+                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
+                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; average-rational
+                         0
+                         0
+                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
+
+    core-simulate
+
+    set liste-plot-average-rational lput (list ? (mean [effort] of turtles) ) liste-plot-average-rational
+  ]
+
+  let liste-plot (list (list "expected" liste-plot-expected)
+                       (list "rational" liste-plot-rational)
+                       (list "average-rational" liste-plot-average-rational)
+                       )
+
+  ;; Affiche le plot voulu
+  do-plotting "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort" liste-plot
+end
+
 ;; core-simulate
 ;; ---
 ;; Effectue la simulation tant que l'écart-type des 200 dernières itérations n'est pas inférieur à la précision voulue : ecart-type-max
-;; • type-agent : type d'agent qui nous intéresse et qui va être
-to core-simulate [ type-agent ]
+to core-simulate
   let counter 0
-  if count turtles with [agent-type = type-agent] > 0
-  [
-    let tampon (list (mean [effort] of turtles with [agent-type = type-agent]) )
-    ;; • Au moins min-nb-iterations itération
-    ;; • Tant que la moyenne de la moyenne des efforts des agents durant min-nb-iterations dernières itérations
-    ;; • est supérieure à ecart-type-max
-    ;; • Au plus max-nb-iterations itérations
-    while [ (counter < min-nb-iterations or standard-deviation tampon > ecart-type-max) and counter < max-nb-iterations ]
+  let tampon (list (mean [effort] of turtles) )
+  ;; • Au moins min-nb-iterations itération
+  ;; • Tant que la moyenne de la moyenne des efforts des agents durant min-nb-iterations dernières itérations
+  ;; • est supérieure à ecart-type-max
+  ;; • Au plus max-nb-iterations itérations
+  while [ (counter < min-nb-iterations or standard-deviation tampon > ecart-type-max) and counter < max-nb-iterations ]
     [
       go-simulate
       ifelse counter > min-nb-iterations
       [
-        set tampon lput (mean [effort] of turtles with [agent-type = type-agent]) tampon
+        set tampon lput (mean [effort] of turtles) tampon
       ]
       [
-        set tampon remove 0 (lput (mean [effort] of turtles with [agent-type = type-agent]) tampon)
+        set tampon remove 0 (lput (mean [effort] of turtles) tampon)
       ]
       set counter counter + 1
     ]
 
-    show (sentence "Simulation sur des agents de type " type-agent " avec " (count turtles with [agent-type = 5] / count turtles) )
-    show (word "Nombre d'itération " counter)
-  ]
+  show (sentence "Simulation avec " (count turtles with [agent-type = 5] / count turtles) " % de high effort")
+  show (word "Nombre d'itération " counter)
 end
 
-to setup-simulate [ liste ]
+;; setup-simulate
+;; ---
+;; • liste : Liste du nombre d'agents de chaque type dans la simulation
+;; • name-of-plot : nom du plot dans lequel on ajoute tout ça
+to setup-simulate [ liste name-of-plot ]
   clear-turtles
   clear-patches
-  set-current-plot "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
+  set-current-plot name-of-plot
   clear-plot
 
   set effort-min 0.0001
@@ -673,7 +738,7 @@ SWITCH
 120
 display-effort
 display-effort
-1
+0
 1
 -1000
 
@@ -738,7 +803,7 @@ INPUTBOX
 281
 191
 nb-agents-5
-200
+50
 1
 0
 Number
@@ -771,7 +836,7 @@ INPUTBOX
 278
 486
 nb-agents-8
-400
+911
 1
 0
 Number
@@ -886,7 +951,7 @@ noise-value
 noise-value
 1
 50
-50
+46
 1
 1
 NIL
@@ -918,7 +983,7 @@ PLOT
 25
 976
 782
-1449
+1437
 Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort
 Pourcentage d'agents high effort
 Effort Moyen
@@ -930,20 +995,13 @@ true
 true
 "" ""
 PENS
-"null effort" 1.0 0 -7500403 true "" ""
-"shrinking effort" 1.0 0 -2674135 true "" ""
-"replicator" 1.0 0 -955883 true "" ""
-"profit comparator" 1.0 0 -1184463 true "" ""
-"winner imitator" 1.0 0 -13345367 true "" ""
-"effort comparator" 1.0 0 -5825686 true "" ""
-"averager" 1.0 0 -2064490 true "" ""
 
 BUTTON
 25
 936
-112
+115
 969
-figure 6
+Figure 6
 simulate-fig6
 NIL
 1
@@ -1041,23 +1099,6 @@ Bruit
 16
 0.0
 1
-
-PLOT
-1146
-52
-1720
-568
-Affichage des efforts
-NIL
-NIL
-0.0
-10.0
-0.0
-10.0
-true
-false
-"set-plot-x-range -1 (max-pxcor + 1)\nset-plot-y-range -1 (max-pycor + 1)\ncreate-temporary-plot-pen \"effort\"\nset-plot-pen-mode 2" "clear-plot\nset-plot-x-range -1 (max-pxcor + 1)\nset-plot-y-range -1 (max-pycor + 1)\ncreate-temporary-plot-pen \"effort\"\nset-plot-pen-mode 2\nask turtles\n[\nset-plot-pen-color color-effort\nset pen-size 10\nplotxy xcor ycor\n]"
-PENS
 
 TEXTBOX
 26
@@ -1205,8 +1246,8 @@ max-nb-iterations
 max-nb-iterations
 500
 50000
-50000
-1
+25000
+100
 1
 NIL
 HORIZONTAL
@@ -1225,6 +1266,23 @@ ecart-type-max
 1
 NIL
 HORIZONTAL
+
+BUTTON
+133
+936
+223
+969
+Figure 7
+simulate-fig7
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
