@@ -397,138 +397,27 @@ end
 ;; ---
 ;; Lance une batterie de simulation pour créer un plot des résultats similaires à la figure 6 de l'article
 to simulate-fig6
-  ;; Initialisation des listes stockant les valeurs à afficher
-  let liste-plot-null []
-  let liste-plot-shrinking []
-  let liste-plot-replicator []
-  let liste-plot-profit []
-  let liste-plot-imitator []
-  let liste-plot-effort []
-  let liste-plot-averager []
+  let name-of-plot "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
+  ;; Initialisation de la liste des efforts attendus (l'équilibre de Nash pour chaque pourcentage de high effort)
+  let liste-plot-expected (list (list 0 0.92101) (list 0.6 0.92701) (list 5.6 0.98101)  (list 33.3 1.28100)  (list 66.7 1.64100) (list 100 2.00100) )
 
   ;; Initialisation de variables temporaires
   let counter 0
   let tampon []
 
-  ;; Boucle lançant la simulation pour chaque proportion de high effort voulue pour chaque type d'agent
-  foreach (list 0.6 5.6 33.3 66.7 100)
-  [
-    let pourcentage ?
-    ;; null effort
-    setup-simulate (list (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; null effort
-                         0
-                         0
-                         0
-                         0
-                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
-                         0
-                         0
-                         0
-                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
+  ;; Initialisation de la liste des pourcentages de high effort dans la population de la simulation
+  let liste-pourcentages (list 0.6 5.6 33.3 66.7 100)
 
-    core-simulate
+  ;; Lancement des simulations pour les types d'agents voulus (rational et average rational)
+  let liste-plot-null launch-simulations liste-pourcentages 0 name-of-plot
+  let liste-plot-shrinking launch-simulations liste-pourcentages 1 name-of-plot
+  let liste-plot-replicator launch-simulations liste-pourcentages 2 name-of-plot
+  let liste-plot-profit launch-simulations liste-pourcentages 4 name-of-plot
+  let liste-plot-imitator launch-simulations liste-pourcentages 7 name-of-plot
+  let liste-plot-effort launch-simulations liste-pourcentages 8 name-of-plot
+  let liste-plot-averager launch-simulations liste-pourcentages 9 name-of-plot
 
-    set liste-plot-null lput (list ? (mean [effort] of turtles) ) liste-plot-null
-
-    ;; shrinking effort
-    setup-simulate (list 0
-                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; shrinking effort
-                         0
-                         0
-                         0
-                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
-                         0
-                         0
-                         0
-                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
-
-    core-simulate
-
-    set liste-plot-shrinking lput (list ? (mean [effort] of turtles) ) liste-plot-shrinking
-
-    ;; replicator
-    setup-simulate (list 0
-                         0
-                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; replicator
-                         0
-                         0
-                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
-                         0
-                         0
-                         0
-                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
-
-    core-simulate
-
-    set liste-plot-replicator lput (list ? (mean [effort] of turtles) ) liste-plot-replicator
-
-    ;; profit comparator
-    setup-simulate (list 0
-                         0
-                         0
-                         0
-                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; profit comparator
-                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
-                         0
-                         0
-                         0
-                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
-
-
-    core-simulate
-
-    set liste-plot-profit lput (list ? (mean [effort] of turtles) ) liste-plot-profit
-
-    ;; winner imitator
-    setup-simulate (list 0
-                         0
-                         0
-                         0
-                         0
-                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
-                         0
-                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; winner imitator
-                         0
-                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
-
-    core-simulate
-
-    set liste-plot-imitator lput (list ? (mean [effort] of turtles) ) liste-plot-imitator
-
-    ;; effort comparator
-    setup-simulate (list 0
-                         0
-                         0
-                         0
-                         0
-                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
-                         0
-                         0
-                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; effort comparator
-                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
-
-    core-simulate
-
-    set liste-plot-effort lput (list ? (mean [effort] of turtles) ) liste-plot-effort
-
-    ;; averager
-    setup-simulate (list 0
-                         0
-                         0
-                         0
-                         0
-                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))         ;; high effort
-                         0
-                         0
-                         0
-                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ) ;; average
-                         "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
-
-    core-simulate
-
-    set liste-plot-averager lput (list ? (mean [effort] of turtles) ) liste-plot-averager
-  ]
-
+  ;; Création de la liste à envoyer pour faire l'affichage du plot
   let liste-plot (list (list "null effort" liste-plot-null)
                        (list "shrinking effort" liste-plot-shrinking)
                        (list "replicator" liste-plot-replicator)
@@ -538,7 +427,7 @@ to simulate-fig6
                        (list "averager" liste-plot-averager) )
 
   ;; Affiche le plot voulu
-  do-plotting "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort" liste-plot
+  do-plotting name-of-plot liste-plot
 end
 
 
@@ -546,59 +435,29 @@ end
 ;; ---
 ;; Lance une batterie de simulation pour créer un plot des résultats similaires à la figure 7 de l'article
 to simulate-fig7
-  ;; Initialisation des listes stockant les valeurs à afficher
+  let name-of-plot "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
+  ;; Initialisation de la liste des efforts attendus (l'équilibre de Nash pour chaque pourcentage de high effort)
   let liste-plot-expected (list (list 0 0.92101) (list 0.6 0.92701) (list 5.6 0.98101)  (list 33.3 1.28100)  (list 66.7 1.64100) (list 100 2.00100) )
-  let liste-plot-rational []
-  let liste-plot-average-rational []
 
   ;; Initialisation de variables temporaires
   let counter 0
   let tampon []
 
-  ;; Boucle lançant la simulation pour chaque proportion de high effort voulue pour chaque type d'agent
-  foreach (list 0.6 5.6 33.3 66.7 100)
-  [
-    let pourcentage ?
-    ;; rational
-    setup-simulate (list 0
-                         0
-                         0
-                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; rational
-                         0
-                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
-                         0
-                         0
-                         0
-                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
+  ;; Initialisation de la liste des pourcentages de high effort dans la population de la simulation
+  let liste-pourcentages (list 0.6 5.6 33.3 66.7 100)
 
-    core-simulate
+  ;; Lancement des simulations pour les types d'agents voulus (rational et average rational)
+  let liste-plot-rational launch-simulations liste-pourcentages 3 name-of-plot
+  let liste-plot-average-rational launch-simulations liste-pourcentages 6 name-of-plot
 
-    set liste-plot-rational lput (list ? (mean [effort] of turtles) ) liste-plot-rational
-
-    ;; average-rational
-    setup-simulate (list 0
-                         0
-                         0
-                         0
-                         0
-                         (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 ))       ;; high effort
-                         (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) ;; average-rational
-                         0
-                         0
-                         0 ) "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
-
-    core-simulate
-
-    set liste-plot-average-rational lput (list ? (mean [effort] of turtles) ) liste-plot-average-rational
-  ]
-
+  ;; Création de la liste à envoyer pour faire l'affichage du plot
   let liste-plot (list (list "expected" liste-plot-expected)
                        (list "rational" liste-plot-rational)
                        (list "average-rational" liste-plot-average-rational)
                        )
 
   ;; Affiche le plot voulu
-  do-plotting "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort" liste-plot
+  do-plotting name-of-plot liste-plot
 end
 
 ;; core-simulate
@@ -633,6 +492,45 @@ to core-simulate
   show (word "Moyenne d'effort fourni par les agents : " (mean [effort] of turtles))
 end
 
+;; launch-simulations
+;; ---
+;; Fait le setup, lance la simulation, et stocke les résultats dans une liste
+;; • liste-pourcentages : Liste des pourcentages de high effort à simuler
+;; • type-agent : type d'agent qui complète l'environnement
+;; • name-of-plot : nom du plot dans lequel on ajoute tout ça
+to-report launch-simulations [ liste-pourcentages type-agent name-of-plot]
+  ;; Initialisation du retour : liste-resultats étant la liste dans laquelle on va stocker les résultats
+  let liste-resultats []
+  ;; on effectue la simulation pour chaque pourcentage de la liste
+  foreach liste-pourcentages
+  [
+    let pourcentage ?
+
+    ;; setup
+    let liste-nb-agents []
+    ;; ajout du bon nombre d'agents voulu dans la liste
+    foreach [ 0 1 2 3 4 5 6 7 8 9 ]
+    [
+      ifelse ? = type-agent
+      [ set liste-nb-agents lput (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) liste-nb-agents ]
+      [
+        ifelse ? = 5
+        [ set liste-nb-agents lput (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) liste-nb-agents ]
+        [ set liste-nb-agents lput 0 liste-nb-agents ]
+      ]
+    ]
+    setup-simulate liste-nb-agents name-of-plot
+
+    ;; Lancement de la simulation
+    core-simulate
+
+    ;; Ajout du resultat à la liste
+    set liste-resultats lput (list ? (mean [effort] of turtles) ) liste-resultats
+  ]
+  report liste-resultats
+end
+
+
 ;; setup-simulate
 ;; ---
 ;; • liste : Liste du nombre d'agents de chaque type dans la simulation
@@ -658,6 +556,9 @@ to setup-simulate [ liste name-of-plot ]
   RandAgent 9 item 9 liste
 end
 
+;; go-simulate
+;; ---
+;; Procédure de lancement pour les simulations des figures 6 et 7
 to go-simulate
   ask turtles
   [
@@ -669,7 +570,7 @@ to go-simulate
     let partenaire partner
     if partenaire != nobody [
       WorkAgent [effort] of partenaire ]
-    update-color-effort
+    ;;update-color-effort
   ]
 end
 @#$#@#$#@
