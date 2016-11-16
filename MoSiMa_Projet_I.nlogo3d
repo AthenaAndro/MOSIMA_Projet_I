@@ -624,8 +624,13 @@ to core-simulate
       set counter counter + 1
     ]
 
-  show (sentence "Simulation avec " (count turtles with [agent-type = 5] / count turtles) " % de high effort")
+  let others turtles with [agent-type != 5]
+  ifelse any? others
+  [ let other-type [agent-type] of one-of others
+    show (word "Simulation d'agents de type " other-type " avec " ((count turtles with [agent-type = 5] / count turtles) * 100) " % de high effort") ]
+  [ show (word "Simulation avec 100 % de high effort") ]
   show (word "Nombre d'itération " counter)
+  show (word "Moyenne d'effort fourni par les agents : " (mean [effort] of turtles))
 end
 
 ;; setup-simulate
@@ -938,7 +943,7 @@ SWITCH
 340
 noise?
 noise?
-0
+1
 1
 -1000
 
@@ -1246,7 +1251,7 @@ max-nb-iterations
 max-nb-iterations
 500
 50000
-25000
+25300
 100
 1
 NIL
