@@ -231,7 +231,7 @@ to WorkAgent [parteff]
   ;; Mise à jour des variables en fonction de l'effort du partenaire
   ifelse noise?
   [
-    let temp (parteff * (100 + ((random-float (noise-value + 1)) * 2) - noise-value) / 100)
+    let temp parteff - (((parteff * random-float (noise-value + 1)) / 100) * one-of [-1 1])
     set temp min list temp effort-max
     set temp max list temp effort-min
   ]
@@ -340,7 +340,7 @@ to-report best-reply-newton [parteff]
   let x_k 0.5
   let delta_k 0
   let counter 0
-  while [ abs (x_k - x_k-1) > 0.00001 and counter < 10000 ]
+  while [ abs (x_k - x_k-1) > 0.0001 and counter < 10000 ]
   [
     set delta_k calculate-derivee x_k parteff / calculate-derivee-second x_k parteff
     set x_k-1 x_k
@@ -523,10 +523,21 @@ to-report launch-simulations-figs [ liste-pourcentages type-agent name-of-plot]
         [ set liste-nb-agents lput 0 liste-nb-agents ]
       ]
     ]
+
+
+
+    ;; Récupération de la valeur de noise pour la mettre à false puis la remettre à sa valeur initiale en fin de simulation
+    let temp-noise noise?
+    set noise? false
+
+    ;; Setup de l'environnement avec les paramètres souhaités
     setup-simulate-figs liste-nb-agents name-of-plot
 
     ;; Lancement de la simulation
     core-simulate
+
+    ;; Réactivation du bruit
+    set noise? temp-noise
 
     ;; Ajout du resultat à la liste
     set liste-resultats lput (list ? (mean [effort] of turtles) ) liste-resultats
@@ -546,10 +557,6 @@ to setup-simulate-figs [ liste name-of-plot ]
   set-current-plot name-of-plot
   clear-plot
 
-  ;; Récupération de la valeur de noise pour la mettre à false puis la remettre à sa valeur initiale en fin de simulation
-  let temp-noise noise?
-  set noise? false
-
   set effort-min 0.0001
   set effort-max 2.001
 
@@ -563,9 +570,6 @@ to setup-simulate-figs [ liste name-of-plot ]
   RandAgent 7 item 7 liste
   RandAgent 8 item 8 liste
   RandAgent 9 item 9 liste
-
-  ;; Réactivation du bruit
-  set noise? temp-noise
 end
 
 ;; setup-simulate-noise
@@ -629,7 +633,7 @@ to simulate-noise
     show (word "Valeur du bruit : " noise-value)
     create-temporary-plot-pen (word "Bruit : " ? " %")
     set-plot-pen-color item (position ? liste-pourcentages) liste-colors ;; Choix de la couleur de la ligne
-    while [ counter < 10 ]
+    while [ counter < nb-ticks ]
     [
       plot mean [effort] of turtles
       go-simulate
@@ -660,7 +664,6 @@ to go-simulate
     ;;update-color-effort
   ]
 end
-
 
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -776,7 +779,7 @@ INPUTBOX
 118
 487
 nb-agents-3
-0
+961
 1
 0
 Number
@@ -820,7 +823,7 @@ INPUTBOX
 278
 384
 nb-agents-7
-961
+0
 1
 0
 Number
@@ -867,17 +870,17 @@ PENS
 "Ecart-Type " 1.0 0 -16777216 true "" "plot standard-deviation [effort] of turtles"
 
 PLOT
-382
-677
-582
-827
+1143
+521
+1520
+826
 Profit Moyen
 time
 profit
 0.0
 10.0
 0.0
-10.0
+2.2
 true
 false
 "" ""
@@ -953,10 +956,10 @@ noise-value
 HORIZONTAL
 
 MONITOR
-360
-628
-461
-673
+1221
+470
+1322
+515
 Profit Moyen
 mean [profit] of turtles
 5
@@ -964,11 +967,11 @@ mean [profit] of turtles
 11
 
 MONITOR
-459
-444
-576
-489
-Moyenne Effort
+1140
+53
+1333
+98
+Moyenne Globale de l'Effort
 mean [effort] of turtles
 5
 1
@@ -1196,21 +1199,21 @@ averager
 1
 
 MONITOR
-460
-510
-579
-555
-Ecart-type Effort
+1141
+119
+1331
+164
+Ecart-type global de l'Effort
 standard-deviation [effort] of turtles
 5
 1
 11
 
 MONITOR
-465
-628
-583
-673
+1326
+470
+1444
+515
 Ecart-type Profit
 standard-deviation [profit] of turtles
 5
@@ -1297,10 +1300,10 @@ true
 PENS
 
 BUTTON
-841
-935
-931
-968
+837
+934
+927
+967
 Figure 9
 simulate-noise
 NIL
@@ -1322,6 +1325,21 @@ Intensité du bruit :
 12
 0.0
 1
+
+SLIDER
+836
+891
+1008
+924
+nb-ticks
+nb-ticks
+1
+1000
+20
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
