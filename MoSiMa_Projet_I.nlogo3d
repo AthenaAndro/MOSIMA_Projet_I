@@ -247,7 +247,7 @@ to WorkAgent [parteff]
   if agent-type = 2 [ set effort aeffort ]
   if agent-type = 3
   [
-    set effort best-reply aeffort
+    set effort best-reply-cardan aeffort
     ;; Newton se fait la plupart du temps en moins de 20 itérations,
     ;; pour un profit très proche du best-reply deterministe, parfoit même meilleur
     ;let tmp best-reply-newton aeffort
@@ -258,7 +258,7 @@ to WorkAgent [parteff]
     ifelse profit > aprofit [ set effort effort * 1.1 ]; set effort min (list (effort * 1.1) effort-max) ]
     [ set effort max (list (effort * 0.9) effort-min) ]
   ]
-  if agent-type = 6 [ set effort best-reply (cumeffort / numinc) ]
+  if agent-type = 6 [ set effort best-reply-cardan (cumeffort / numinc) ]
   if agent-type = 7 [
     if profit < aprofit [ set effort aeffort ]
   ]
@@ -297,8 +297,11 @@ to-report best-reply-cardan [parteff]
   ;; Initialisation des variables nécessaires au calcul
   let q ((parteff ^ 3) * 2 / 27 - 25 / 16)
   let delta (625 / 1024 - 25 / 432 * parteff ^ 3)
-
-  report (- q / 2 + (sqrt delta)) ^ (1 / 3) + (- q / 2 - (sqrt delta)) ^ (1 / 3) - parteff / 3
+  let q1 ((- q / 2 + (sqrt delta)) ^ (1 / 3))
+  let q2 ((- q / 2 - (sqrt delta)) ^ (1 / 3))
+  ifelse is-number? q2 and is-number? q2
+  [ report (- q / 2 + (sqrt delta)) ^ (1 / 3) + (- q / 2 - (sqrt delta)) ^ (1 / 3) - parteff / 3 ]
+  [ report best-reply parteff ]
 end
 
 ;; best-reply
@@ -383,6 +386,7 @@ end
 ;;              do-plotting "test" (list (list "null effort" (list (list 1 1 ) (list 2 3 ) )))
 to do-plotting [ nom liste ]
   set-current-plot nom
+  clear-plot
   let counter 0
   foreach liste
   [
@@ -413,13 +417,13 @@ to simulate-fig6
   let liste-pourcentages (list 0.6 5.6 33.3 66.7 100)
 
   ;; Lancement des simulations pour les types d'agents voulus (rational et average rational)
-  let liste-plot-null launch-simulations-figs liste-pourcentages 0 name-of-plot
-  let liste-plot-shrinking launch-simulations-figs liste-pourcentages 1 name-of-plot
-  let liste-plot-replicator launch-simulations-figs liste-pourcentages 2 name-of-plot
-  let liste-plot-profit launch-simulations-figs liste-pourcentages 4 name-of-plot
-  let liste-plot-imitator launch-simulations-figs liste-pourcentages 7 name-of-plot
-  let liste-plot-effort launch-simulations-figs liste-pourcentages 8 name-of-plot
-  let liste-plot-averager launch-simulations-figs liste-pourcentages 9 name-of-plot
+  let liste-plot-null launch-simulations-figs liste-pourcentages 0
+  let liste-plot-shrinking launch-simulations-figs liste-pourcentages 1
+  let liste-plot-replicator launch-simulations-figs liste-pourcentages 2
+  let liste-plot-profit launch-simulations-figs liste-pourcentages 4
+  let liste-plot-imitator launch-simulations-figs liste-pourcentages 7
+  let liste-plot-effort launch-simulations-figs liste-pourcentages 8
+  let liste-plot-averager launch-simulations-figs liste-pourcentages 9
 
   ;; Création de la liste à envoyer pour faire l'affichage du plot
   let liste-plot (list (list "null effort" liste-plot-null)
@@ -451,8 +455,8 @@ to simulate-fig7
   let liste-pourcentages (list 0.6 5.6 33.3 66.7 100)
 
   ;; Lancement des simulations pour les types d'agents voulus (rational et average rational)
-  let liste-plot-rational launch-simulations-figs liste-pourcentages 3 name-of-plot
-  let liste-plot-average-rational launch-simulations-figs liste-pourcentages 6 name-of-plot
+  let liste-plot-rational launch-simulations-figs liste-pourcentages 3
+  let liste-plot-average-rational launch-simulations-figs liste-pourcentages 6
 
   ;; Création de la liste à envoyer pour faire l'affichage du plot
   let liste-plot (list (list "expected" liste-plot-expected)
@@ -501,8 +505,7 @@ end
 ;; Fait le setup, lance la simulation, et stocke les résultats dans une liste
 ;; • liste-pourcentages : Liste des pourcentages de high effort à simuler
 ;; • type-agent : type d'agent qui complète l'environnement
-;; • name-of-plot : nom du plot dans lequel on ajoute tout ça
-to-report launch-simulations-figs [ liste-pourcentages type-agent name-of-plot]
+to-report launch-simulations-figs [ liste-pourcentages type-agent ]
   ;; Initialisation du retour : liste-resultats étant la liste dans laquelle on va stocker les résultats
   let liste-resultats []
   ;; on effectue la simulation pour chaque pourcentage de la liste
@@ -531,7 +534,7 @@ to-report launch-simulations-figs [ liste-pourcentages type-agent name-of-plot]
     set noise? false
 
     ;; Setup de l'environnement avec les paramètres souhaités
-    setup-simulate-figs liste-nb-agents name-of-plot
+    setup-simulate liste-nb-agents
 
     ;; Lancement de la simulation
     core-simulate
@@ -546,42 +549,13 @@ to-report launch-simulations-figs [ liste-pourcentages type-agent name-of-plot]
 end
 
 
-;; setup-simulate-figs
+;; setup-simulate
 ;; ---
 ;; Fait le setup pour les simulations en rapport avec les figures 6 et 7
 ;; • liste : Liste du nombre d'agents de chaque type dans la simulation
-;; • name-of-plot : nom du plot dans lequel on ajoute tout ça
-to setup-simulate-figs [ liste name-of-plot ]
+to setup-simulate [ liste ]
   clear-turtles
   clear-patches
-  set-current-plot name-of-plot
-  clear-plot
-
-  set effort-min 0.0001
-  set effort-max 2.001
-
-  RandAgent 0 item 0 liste
-  RandAgent 1 item 1 liste
-  RandAgent 2 item 2 liste
-  RandAgent 3 item 3 liste
-  RandAgent 4 item 4 liste
-  RandAgent 5 item 5 liste
-  RandAgent 6 item 6 liste
-  RandAgent 7 item 7 liste
-  RandAgent 8 item 8 liste
-  RandAgent 9 item 9 liste
-end
-
-;; setup-simulate-noise
-;; ---
-;; Fait le setup pour les simulations en rapport avec les effets du bruit sur une population d'agents
-;; • liste : Liste du nombre d'agents de chaque type dans la simulation
-;; • name-of-plot : nom du plot dans lequel on ajoute tout ça
-;; • valeur-noise : valeur du vruit à appliquer
-to setup-simulate-noise [ liste name-of-plot valeur-noise]
-  clear-turtles
-  clear-patches
-  set-current-plot name-of-plot
 
   set effort-min 0.0001
   set effort-max 2.001
@@ -628,7 +602,7 @@ to simulate-noise
     [ set noise? false ]
 
     set counter 0
-    setup-simulate-noise liste-nb-agents name-of-plot ?
+    setup-simulate liste-nb-agents
     show (word "Bruit activé ? " noise?)
     show (word "Valeur du bruit : " noise-value)
     create-temporary-plot-pen (word "Bruit : " ? " %")
@@ -664,7 +638,6 @@ to go-simulate
     ;;update-color-effort
   ]
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 0
@@ -779,7 +752,7 @@ INPUTBOX
 118
 487
 nb-agents-3
-961
+400
 1
 0
 Number
@@ -812,7 +785,7 @@ INPUTBOX
 279
 285
 nb-agents-6
-0
+400
 1
 0
 Number
@@ -936,7 +909,7 @@ SWITCH
 340
 noise?
 noise?
-0
+1
 1
 -1000
 
@@ -1037,16 +1010,16 @@ true
 true
 "" ""
 PENS
-"null effort" 1.0 0 -7500403 true "" "if nb-agents-0 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 0] ]"
-"shrinking effort" 1.0 0 -2674135 true "" "if nb-agents-1 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 1] ]"
-"replicator" 1.0 0 -955883 true "" "if nb-agents-2 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 2] ]"
-"rational" 1.0 0 -6459832 true "" "if nb-agents-3 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 3] ]"
-"profit comparator" 1.0 0 -1184463 true "" "if nb-agents-4 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 4] ]"
-"high effort" 1.0 0 -10899396 true "" "if nb-agents-5 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 5] ]"
-"average rational" 1.0 0 -11221820 true "" "if nb-agents-6 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 6] ]"
-"winner imitator" 1.0 0 -13345367 true "" "if nb-agents-7 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 7] ]"
-"effort comparator" 1.0 0 -5825686 true "" "if nb-agents-8 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 8] ]"
-"averager" 1.0 0 -2064490 true "" "if nb-agents-9 > 0 [ plot standard-deviation [effort] of turtles with [agent-type = 9] ]"
+"null effort" 1.0 0 -7500403 true "" "if nb-agents-0 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 0] ]"
+"shrinking effort" 1.0 0 -2674135 true "" "if nb-agents-1 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 1] ]"
+"replicator" 1.0 0 -955883 true "" "if nb-agents-2 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 2] ]"
+"rational" 1.0 0 -6459832 true "" "if nb-agents-3 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 3] ]"
+"profit comparator" 1.0 0 -1184463 true "" "if nb-agents-4 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 4] ]"
+"high effort" 1.0 0 -10899396 true "" "if nb-agents-5 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 5] ]"
+"average rational" 1.0 0 -11221820 true "" "if nb-agents-6 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 6] ]"
+"winner imitator" 1.0 0 -13345367 true "" "if nb-agents-7 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 7] ]"
+"effort comparator" 1.0 0 -5825686 true "" "if nb-agents-8 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 8] ]"
+"averager" 1.0 0 -2064490 true "" "if nb-agents-9 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 9] ]"
 
 TEXTBOX
 588
