@@ -231,7 +231,7 @@ to WorkAgent [parteff]
   ;; Mise à jour des variables en fonction de l'effort du partenaire
   ifelse noise?
   [
-    let temp (parteff * (100 + ((random (noise-value + 1)) * 2) - noise-value) / 100)
+    let temp (parteff * (100 + ((random-float (noise-value + 1)) * 2) - noise-value) / 100)
     set temp min list temp effort-max
     set temp max list temp effort-min
   ]
@@ -288,11 +288,12 @@ to RandDir
 end
 
 ;; Pose problème pour certaines valeurs de parteff à cause de la racine cubique. Dommage...
-;; best-reply2
+;; best-reply-cardan
 ;; ---
+;; Utilise la méthode de résolution des équations cubiques de Cardan
 ;; Renvoie la meilleure réponse (i.e. qui maximise le profit) à l'effort passé en paramètres
 ;; • parteff : effort fourni par le partenaire (ou moyenne d'efforts)
-to-report best-reply2 [parteff]
+to-report best-reply-cardan [parteff]
   ;; Initialisation des variables nécessaires au calcul
   let q ((parteff ^ 3) * 2 / 27 - 25 / 16)
   let delta (625 / 1024 - 25 / 432 * parteff ^ 3)
@@ -315,12 +316,15 @@ to-report best-reply [parteff]
   while [ counter <= effort-max ]
   [
     set temp calculate-profit counter parteff
-    if temp > max-profit
+    ifelse temp < max-profit
+    [
+      report max-reply ;; Si on redescent, c'est qu'on a déjà atteint le maximum, puisque la fonction est concave, on peut donc retourner la valeur trouvée
+    ]
     [
       set max-profit temp
       set max-reply counter
     ]
-    set counter counter + 0.01
+    set counter counter + 0.005
   ]
 
   report max-reply
@@ -343,7 +347,7 @@ to-report best-reply-newton [parteff]
     set x_k x_k - delta_k
     set counter counter + 1
   ]
-  report (list x_k counter)
+  report min (list (max (list x_k effort-min)) effort-max)
 end
 
 ;; calculate-derivee
@@ -409,13 +413,13 @@ to simulate-fig6
   let liste-pourcentages (list 0.6 5.6 33.3 66.7 100)
 
   ;; Lancement des simulations pour les types d'agents voulus (rational et average rational)
-  let liste-plot-null launch-simulations liste-pourcentages 0 name-of-plot
-  let liste-plot-shrinking launch-simulations liste-pourcentages 1 name-of-plot
-  let liste-plot-replicator launch-simulations liste-pourcentages 2 name-of-plot
-  let liste-plot-profit launch-simulations liste-pourcentages 4 name-of-plot
-  let liste-plot-imitator launch-simulations liste-pourcentages 7 name-of-plot
-  let liste-plot-effort launch-simulations liste-pourcentages 8 name-of-plot
-  let liste-plot-averager launch-simulations liste-pourcentages 9 name-of-plot
+  let liste-plot-null launch-simulations-figs liste-pourcentages 0 name-of-plot
+  let liste-plot-shrinking launch-simulations-figs liste-pourcentages 1 name-of-plot
+  let liste-plot-replicator launch-simulations-figs liste-pourcentages 2 name-of-plot
+  let liste-plot-profit launch-simulations-figs liste-pourcentages 4 name-of-plot
+  let liste-plot-imitator launch-simulations-figs liste-pourcentages 7 name-of-plot
+  let liste-plot-effort launch-simulations-figs liste-pourcentages 8 name-of-plot
+  let liste-plot-averager launch-simulations-figs liste-pourcentages 9 name-of-plot
 
   ;; Création de la liste à envoyer pour faire l'affichage du plot
   let liste-plot (list (list "null effort" liste-plot-null)
@@ -447,8 +451,8 @@ to simulate-fig7
   let liste-pourcentages (list 0.6 5.6 33.3 66.7 100)
 
   ;; Lancement des simulations pour les types d'agents voulus (rational et average rational)
-  let liste-plot-rational launch-simulations liste-pourcentages 3 name-of-plot
-  let liste-plot-average-rational launch-simulations liste-pourcentages 6 name-of-plot
+  let liste-plot-rational launch-simulations-figs liste-pourcentages 3 name-of-plot
+  let liste-plot-average-rational launch-simulations-figs liste-pourcentages 6 name-of-plot
 
   ;; Création de la liste à envoyer pour faire l'affichage du plot
   let liste-plot (list (list "expected" liste-plot-expected)
@@ -492,13 +496,13 @@ to core-simulate
   show (word "Moyenne d'effort fourni par les agents : " (mean [effort] of turtles))
 end
 
-;; launch-simulations
+;; launch-simulations-figs
 ;; ---
 ;; Fait le setup, lance la simulation, et stocke les résultats dans une liste
 ;; • liste-pourcentages : Liste des pourcentages de high effort à simuler
 ;; • type-agent : type d'agent qui complète l'environnement
 ;; • name-of-plot : nom du plot dans lequel on ajoute tout ça
-to-report launch-simulations [ liste-pourcentages type-agent name-of-plot]
+to-report launch-simulations-figs [ liste-pourcentages type-agent name-of-plot]
   ;; Initialisation du retour : liste-resultats étant la liste dans laquelle on va stocker les résultats
   let liste-resultats []
   ;; on effectue la simulation pour chaque pourcentage de la liste
@@ -519,7 +523,7 @@ to-report launch-simulations [ liste-pourcentages type-agent name-of-plot]
         [ set liste-nb-agents lput 0 liste-nb-agents ]
       ]
     ]
-    setup-simulate liste-nb-agents name-of-plot
+    setup-simulate-figs liste-nb-agents name-of-plot
 
     ;; Lancement de la simulation
     core-simulate
@@ -531,15 +535,20 @@ to-report launch-simulations [ liste-pourcentages type-agent name-of-plot]
 end
 
 
-;; setup-simulate
+;; setup-simulate-figs
 ;; ---
+;; Fait le setup pour les simulations en rapport avec les figures 6 et 7
 ;; • liste : Liste du nombre d'agents de chaque type dans la simulation
 ;; • name-of-plot : nom du plot dans lequel on ajoute tout ça
-to setup-simulate [ liste name-of-plot ]
+to setup-simulate-figs [ liste name-of-plot ]
   clear-turtles
   clear-patches
   set-current-plot name-of-plot
   clear-plot
+
+  ;; Récupération de la valeur de noise pour la mettre à false puis la remettre à sa valeur initiale en fin de simulation
+  let temp-noise noise?
+  set noise? false
 
   set effort-min 0.0001
   set effort-max 2.001
@@ -554,6 +563,84 @@ to setup-simulate [ liste name-of-plot ]
   RandAgent 7 item 7 liste
   RandAgent 8 item 8 liste
   RandAgent 9 item 9 liste
+
+  ;; Réactivation du bruit
+  set noise? temp-noise
+end
+
+;; setup-simulate-noise
+;; ---
+;; Fait le setup pour les simulations en rapport avec les effets du bruit sur une population d'agents
+;; • liste : Liste du nombre d'agents de chaque type dans la simulation
+;; • name-of-plot : nom du plot dans lequel on ajoute tout ça
+;; • valeur-noise : valeur du vruit à appliquer
+to setup-simulate-noise [ liste name-of-plot valeur-noise]
+  clear-turtles
+  clear-patches
+  set-current-plot name-of-plot
+
+  set effort-min 0.0001
+  set effort-max 2.001
+
+  RandAgent 0 item 0 liste
+  RandAgent 1 item 1 liste
+  RandAgent 2 item 2 liste
+  RandAgent 3 item 3 liste
+  RandAgent 4 item 4 liste
+  RandAgent 5 item 5 liste
+  RandAgent 6 item 6 liste
+  RandAgent 7 item 7 liste
+  RandAgent 8 item 8 liste
+  RandAgent 9 item 9 liste
+end
+
+;; simulate-noise
+;; ---
+;; Lance une batterie de simulation pour créer un plot des résultats similaires à la figure 9 de l'article
+;; Cette figure donnait l'évolution de l'effort dans une population homogène de winner-imitators en fonction du bruit
+to simulate-noise
+  ;; Initialisation de variables
+  let name-of-plot "Effet du bruit sur une population de winner-imitators"
+  let counter 0
+  set-current-plot name-of-plot
+  clear-plot
+
+  ;; Initialisation des listes nécessaires aux setups et calculs
+  let liste-nb-agents (list 0 0 0 0 0 0 0 ((max-pxcor + 1) * (max-pycor + 1)) 0 0 )
+  let liste-pourcentages (list 0 1 25 50)
+  let liste-colors (list blue magenta yellow cyan)
+
+  ;; Lancement de la simulation
+  foreach liste-pourcentages
+  [
+    ;; Récupération de la valeur de noise pour la mettre à true puis la remettre à sa valeur initiale en fin de simulation
+    let temp-noise noise?
+    let temp-noise-value noise-value
+    ifelse ? > 0
+    [
+      set noise? true
+      set noise-value ?
+    ]
+    [ set noise? false ]
+
+    set counter 0
+    setup-simulate-noise liste-nb-agents name-of-plot ?
+    show (word "Bruit activé ? " noise?)
+    show (word "Valeur du bruit : " noise-value)
+    create-temporary-plot-pen (word "Bruit : " ? " %")
+    set-plot-pen-color item (position ? liste-pourcentages) liste-colors ;; Choix de la couleur de la ligne
+    while [ counter < 10 ]
+    [
+      plot mean [effort] of turtles
+      go-simulate
+      set counter counter + 1
+    ]
+      plot mean [effort] of turtles
+
+    ;; Réactivation du bruit
+    set noise? temp-noise
+    set noise-value temp-noise-value
+  ]
 end
 
 ;; go-simulate
@@ -573,6 +660,8 @@ to go-simulate
     ;;update-color-effort
   ]
 end
+
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 0
@@ -764,8 +853,8 @@ PLOT
 1134
 203
 Moyenne et Ecart-type Effort global
-time
-effort
+Time
+Valeur
 0.0
 10.0
 0.0
@@ -801,8 +890,8 @@ PLOT
 1133
 518
 Moyenne effort selon type d'agent
-time
-effort
+Time
+Moyenne d'Effort
 0.0
 10.0
 0.0
@@ -844,15 +933,15 @@ SWITCH
 340
 noise?
 noise?
-1
+0
 1
 -1000
 
 SLIDER
-361
-357
-533
-390
+360
+364
+532
+397
 noise-value
 noise-value
 1
@@ -935,8 +1024,8 @@ PLOT
 1133
 827
 Ecart-type effort selon type d'agent
-time
-ecart-type
+Time
+Ecart-Type de l'Effort
 0.0
 10.0
 0.0
@@ -1188,6 +1277,50 @@ NIL
 NIL
 NIL
 NIL
+1
+
+PLOT
+837
+975
+1552
+1436
+Effet du bruit sur une population de winner-imitators
+Time
+Effort
+0.0
+10.0
+0.0
+2.002
+true
+true
+"" ""
+PENS
+
+BUTTON
+841
+935
+931
+968
+Figure 9
+simulate-noise
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+TEXTBOX
+363
+346
+513
+364
+Intensité du bruit :
+12
+0.0
 1
 
 @#$#@#$#@
