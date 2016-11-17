@@ -124,6 +124,8 @@ end
 ;; • nb-agents     : Nombre d'agents de ce type à créer
 to RandAgent [type-agent nb-agents]
   ;; on cherche le min pour créer exactement ce qu'il faut
+  let temp (count patches with [not any? turtles-on self]) - nb-agents
+  if temp < 0 [ show (word "Trop d'agents, " (abs temp) " agent(s) de type " type-agent " n'ont pas été créés pour rester dans la limite des places disponibles") ]
   create-turtles min (list (count patches with [not any? turtles-on self]) nb-agents )
   [
     set agent-type type-agent
@@ -230,13 +232,7 @@ to WorkAgent [parteff]
   set numinc (numinc + 1)
 
   ;; Mise à jour des variables en fonction de l'effort du partenaire
-  ifelse noise?
-  [
-    let temp parteff - (((parteff * random-float (noise-value + 1)) / 100) * one-of [-1 1])
-    set temp min list temp effort-max
-    set temp max list temp effort-min
-  ]
-  [ set aeffort parteff ]
+  set-aeffort parteff
   set profit calculate-profit leffort aeffort
   set cumprof (cumprof + profit)
   set cumeffort cumeffort + aeffort
@@ -270,6 +266,21 @@ to WorkAgent [parteff]
   if agent-type = 9 [ set effort mean (list effort aeffort) ]
 
 
+end
+
+;; set-aeffort
+;; ---
+;; Met à jour la valeur de l'effort du partenaire perçue par l'agent en prenant en compte le bruit éventuel
+;; • parteff : effort fourni par le partenaire
+to set-aeffort [parteff]
+  ifelse noise?
+  [
+    let temp parteff - (((parteff * random-float (noise-value + 1)) / 100) * one-of [-1 1])
+    set temp min list temp effort-max
+    set temp max list temp effort-min
+    set aeffort temp
+  ]
+  [ set aeffort parteff ]
 end
 
 ;; calculate-profit
@@ -588,8 +599,8 @@ to simulate-noise
 
   ;; Initialisation des listes nécessaires aux setups et calculs
   let liste-nb-agents (list 0 0 0 0 0 0 0 ((max-pxcor + 1) * (max-pycor + 1)) 0 0 )
-  let liste-pourcentages (list 0 1 25 50)
-  let liste-colors (list blue magenta yellow cyan)
+  let liste-pourcentages (list 0 1 5 10 15 20 25 50)
+  let liste-colors (list blue magenta pink green lime red yellow cyan)
 
   ;; Lancement de la simulation
   foreach liste-pourcentages
@@ -606,8 +617,8 @@ to simulate-noise
 
     set counter 0
     setup-simulate liste-nb-agents
-    show (word "Bruit activé ? " noise?)
-    show (word "Valeur du bruit : " noise-value)
+    ; show (word "Bruit activé ? " noise?)
+    ; show (word "Valeur du bruit : " noise-value)
     create-temporary-plot-pen (word "Bruit : " ? " %")
     set-plot-pen-color item (position ? liste-pourcentages) liste-colors ;; Choix de la couleur de la ligne
     while [ counter < nb-ticks ]
@@ -756,7 +767,7 @@ INPUTBOX
 118
 487
 nb-agents-3
-400
+961
 1
 0
 Number
@@ -1310,10 +1321,10 @@ SLIDER
 924
 nb-ticks
 nb-ticks
-1
-1000
-20
-1
+100
+10000
+2500
+100
 1
 NIL
 HORIZONTAL
