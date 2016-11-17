@@ -767,7 +767,7 @@ INPUTBOX
 118
 487
 nb-agents-3
-961
+0
 1
 0
 Number
@@ -811,7 +811,7 @@ INPUTBOX
 278
 384
 nb-agents-7
-0
+961
 1
 0
 Number
@@ -891,16 +891,16 @@ true
 true
 "" ""
 PENS
-"null effort" 1.0 0 -7500403 true "" "if nb-agents-0 > 0 [plot mean [effort] of turtles with [agent-type = 0]]"
-"shrinking effort" 1.0 0 -2674135 true "" "if nb-agents-1 > 0 [plot mean [effort] of turtles with [agent-type = 1]]"
-"replicator" 1.0 0 -955883 true "" "if nb-agents-2 > 0 [plot mean [effort] of turtles with [agent-type = 2]]"
-"rational" 1.0 0 -6459832 true "" "if nb-agents-3 > 0 [plot mean [effort] of turtles with [agent-type = 3]]"
-"profit comparator" 1.0 0 -1184463 true "" "if nb-agents-4 > 0 [plot mean [effort] of turtles with [agent-type = 4]]"
-"high effort" 1.0 0 -10899396 true "" "if nb-agents-5 > 0 [plot mean [effort] of turtles with [agent-type = 5]]"
-"average rational" 1.0 0 -11221820 true "" "if nb-agents-6 > 0 [plot mean [effort] of turtles with [agent-type = 6]]"
-"winner imitator" 1.0 0 -13345367 true "" "if nb-agents-7 > 0 [plot mean [effort] of turtles with [agent-type = 7]]"
-"effort comparator" 1.0 0 -5825686 true "" "if nb-agents-8 > 0 [plot mean [effort] of turtles with [agent-type = 8]]"
-"averager" 1.0 0 -2064490 true "" "if nb-agents-9 > 0 [plot mean [effort] of turtles with [agent-type = 9]]"
+"null effort" 1.0 0 -7500403 true "" "if (count turtles with [agent-type = 0]) > 0 [plot mean [effort] of turtles with [agent-type = 0]]"
+"shrinking effort" 1.0 0 -2674135 true "" "if (count turtles with [agent-type = 1]) > 0 [plot mean [effort] of turtles with [agent-type = 1]]"
+"replicator" 1.0 0 -955883 true "" "if (count turtles with [agent-type = 2]) > 0 [plot mean [effort] of turtles with [agent-type = 2]]"
+"rational" 1.0 0 -6459832 true "" "if (count turtles with [agent-type = 3]) > 0 [plot mean [effort] of turtles with [agent-type = 3]]"
+"profit comparator" 1.0 0 -1184463 true "" "if (count turtles with [agent-type = 4]) > 0 [plot mean [effort] of turtles with [agent-type = 4]]"
+"high effort" 1.0 0 -10899396 true "" "if (count turtles with [agent-type = 5]) > 0 [plot mean [effort] of turtles with [agent-type = 5]]"
+"average rational" 1.0 0 -11221820 true "" "if (count turtles with [agent-type = 6]) > 0 [plot mean [effort] of turtles with [agent-type = 6]]"
+"winner imitator" 1.0 0 -13345367 true "" "if (count turtles with [agent-type = 7]) > 0 [plot mean [effort] of turtles with [agent-type = 7]]"
+"effort comparator" 1.0 0 -5825686 true "" "if (count turtles with [agent-type = 8]) > 0 [plot mean [effort] of turtles with [agent-type = 8]]"
+"averager" 1.0 0 -2064490 true "" "if (count turtles with [agent-type = 9]) > 0 [plot mean [effort] of turtles with [agent-type = 9]]"
 
 SLIDER
 367
@@ -924,7 +924,7 @@ SWITCH
 340
 noise?
 noise?
-1
+0
 1
 -1000
 
@@ -1025,16 +1025,16 @@ true
 true
 "" ""
 PENS
-"null effort" 1.0 0 -7500403 true "" "if nb-agents-0 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 0] ]"
-"shrinking effort" 1.0 0 -2674135 true "" "if nb-agents-1 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 1] ]"
-"replicator" 1.0 0 -955883 true "" "if nb-agents-2 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 2] ]"
-"rational" 1.0 0 -6459832 true "" "if nb-agents-3 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 3] ]"
-"profit comparator" 1.0 0 -1184463 true "" "if nb-agents-4 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 4] ]"
-"high effort" 1.0 0 -10899396 true "" "if nb-agents-5 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 5] ]"
-"average rational" 1.0 0 -11221820 true "" "if nb-agents-6 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 6] ]"
-"winner imitator" 1.0 0 -13345367 true "" "if nb-agents-7 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 7] ]"
-"effort comparator" 1.0 0 -5825686 true "" "if nb-agents-8 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 8] ]"
-"averager" 1.0 0 -2064490 true "" "if nb-agents-9 > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 9] ]"
+"null effort" 1.0 0 -7500403 true "" "if (count turtles with [agent-type = 0]) > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 0] ]"
+"shrinking effort" 1.0 0 -2674135 true "" "if (count turtles with [agent-type = 1]) > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 1] ]"
+"replicator" 1.0 0 -955883 true "" "if (count turtles with [agent-type = 2]) > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 2] ]"
+"rational" 1.0 0 -6459832 true "" "if (count turtles with [agent-type = 3]) > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 3] ]"
+"profit comparator" 1.0 0 -1184463 true "" "if (count turtles with [agent-type = 4]) > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 4] ]"
+"high effort" 1.0 0 -10899396 true "" "if (count turtles with [agent-type = 5]) > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 5] ]"
+"average rational" 1.0 0 -11221820 true "" "if (count turtles with [agent-type = 6]) > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 6] ]"
+"winner imitator" 1.0 0 -13345367 true "" "if (count turtles with [agent-type = 7]) > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 7] ]"
+"effort comparator" 1.0 0 -5825686 true "" "if (count turtles with [agent-type = 8]) > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 8] ]"
+"averager" 1.0 0 -2064490 true "" "if (count turtles with [agent-type = 9]) > 1 [ plot standard-deviation [effort] of turtles with [agent-type = 9] ]"
 
 TEXTBOX
 588
@@ -1323,7 +1323,7 @@ nb-ticks
 nb-ticks
 100
 10000
-2500
+1500
 100
 1
 NIL
