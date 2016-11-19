@@ -313,9 +313,12 @@ to-report best-reply-cardan [parteff]
   [
     let q1 ((- q / 2 + (sqrt delta)) ^ (1 / 3))
     let q2 ((- q / 2 - (sqrt delta)) ^ (1 / 3))
-    report (- q / 2 + (sqrt delta)) ^ (1 / 3) + (- q / 2 - (sqrt delta)) ^ (1 / 3) - parteff / 3
+    let best q1 + q2 - parteff / 3
+    report best
   ]
-  [ report best-reply parteff ]
+  [
+    report best-reply parteff
+  ]
 end
 
 ;; best-reply
@@ -324,26 +327,33 @@ end
 ;; • parteff : effort fourni par le partenaire (ou moyenne d'efforts)
 to-report best-reply [parteff]
   ;; Initialisation des variables nécessaires au calcul
-  let max-profit 0
-  let max-reply 0
-  let counter 0
-  let temp 0
+  let max-profit calculate-profit leffort parteff
+  let max-reply leffort
+  let current leffort + effort-min
+  let temp calculate-profit current parteff
 
-  ;; Boucle qui cherche la réponse maximisant le profit en testant un maximum de possibilités
-  while [ counter <= effort-max ]
+  ;; Boucle qui cherche la réponse maximisant le profit en testant les efforts suppérieurs à l'effort fourni actuellement
+  while [ temp >= max-profit ]
   [
-    set temp calculate-profit counter parteff
-    ifelse temp < max-profit
-    [
-      report max-reply ;; Si on redescent, c'est qu'on a déjà atteint le maximum, puisque la fonction est concave, on peut donc retourner la valeur trouvée
-    ]
-    [
-      set max-profit temp
-      set max-reply counter
-    ]
-    set counter counter + 0.005
+    set max-reply current
+    set max-profit temp
+    set current current + effort-min
+    set temp calculate-profit current parteff
   ]
 
+  set current current - effort-min
+  set temp calculate-profit current parteff
+
+  ;; Boucle qui cherche la réponse maximisant le profit en testant les efforts inférieurs à l'effort fourni actuellement
+  while [ current >= effort-min and temp >= max-profit ]
+  [
+    set max-reply current
+    set max-profit temp
+    set current current - effort-min
+    set temp calculate-profit current parteff
+  ]
+
+  ;show bla
   report max-reply
 end
 
@@ -359,11 +369,12 @@ to-report best-reply-newton [parteff]
   let counter 0
   while [ abs (x_k - x_k-1) > 0.0001 and counter < 10000 ]
   [
-    set delta_k calculate-derivee x_k parteff / calculate-derivee-second x_k parteff
+    set delta_k ((calculate-derivee x_k parteff) / (calculate-derivee-second x_k parteff))
     set x_k-1 x_k
     set x_k x_k - delta_k
     set counter counter + 1
   ]
+  ;show counter
   report min (list (max (list x_k effort-min)) effort-max)
 end
 
@@ -767,7 +778,7 @@ INPUTBOX
 118
 487
 nb-agents-3
-0
+961
 1
 0
 Number
@@ -811,7 +822,7 @@ INPUTBOX
 278
 384
 nb-agents-7
-961
+0
 1
 0
 Number
@@ -924,7 +935,7 @@ SWITCH
 340
 noise?
 noise?
-0
+1
 1
 -1000
 
@@ -1232,7 +1243,7 @@ max-nb-iterations
 max-nb-iterations
 500
 50000
-25300
+50000
 100
 1
 NIL
@@ -1241,13 +1252,13 @@ HORIZONTAL
 SLIDER
 405
 871
-577
+592
 904
 ecart-type-max
 ecart-type-max
 0.01
 0.5
-0.05
+0.1
 0.01
 1
 NIL
@@ -1323,7 +1334,7 @@ nb-ticks
 nb-ticks
 100
 10000
-1500
+800
 100
 1
 NIL
