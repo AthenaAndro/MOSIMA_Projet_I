@@ -87,6 +87,11 @@ to go
   ]
   ask turtles [set leffort effort]
 
+  if ameliorations?
+  [
+    renouvellement
+  ]
+
   display-color
   tick
 end
@@ -650,20 +655,106 @@ end
 ;; ---
 ;; Procédure de lancement pour les simulations des figures 6 et 7
 to go-simulate
-  ask turtles
+  go
+;  ask turtles
+;  [
+;    RandMove
+;  ]
+;
+;  ask turtles
+;  [
+;    let partenaire partner
+;    if partenaire != nobody [
+;      WorkAgent [leffort] of partenaire ]
+;    ;;update-color-effort
+;  ]
+;  ask turtles [set leffort effort]
+end
+
+;; renouvellement
+;; ---
+;; "Licencie" un certain pourcentage de la population et la remplace par de nouveaux agents
+to renouvellement
+  ifelse standard-deviation [effort] of turtles > ecart-type-renouvellement
   [
-    RandMove
+    ;; Calcul du nombre d'agents à renouveler
+    let nb-to-renew min (list (floor ((count turtles) * pourcentage-renouvellement / 100)) count turtles with [effort < mean [effort] of turtles])
+
+    ;; Suppression des agents les moins bons
+    let temp nb-to-renew
+    while [temp > 0]
+    [
+      ask one-of turtles with [ effort = min [effort] of turtles ] [ die ]
+      set temp temp - 1
+    ]
+
+    ;; Embauche du même nombre d'agents pour remplacer ceux supprimés
+    hire nb-to-renew
+  ]
+  [
+    show "Personne n'a été viré"
+  ]
+end
+
+;; hire
+;; ---
+;; Embauche les nouveaux agents selon la modalité voulue
+;; • nb-to-renew : nombre d'agents à embaucher
+to hire [nb-to-renew]
+  if methode-renouvellement = "Aleatoire" [ hire-random nb-to-renew ]
+  if methode-renouvellement = "Proportion des restants" [ hire-same-proportions nb-to-renew ]
+end
+
+;; hire-random
+;; ---
+;; Effectue une embauche aléatoire
+;; • nb-to-renew : nombre d'agents à embaucher
+to hire-random [nb-to-renew]
+  let temp 0
+  while [ temp < nb-to-renew]
+  [
+    let type-agent random 10
+    RandAgent type-agent 1
+    set temp temp + 1
+  ]
+end
+
+;; hire-random
+;; ---
+;; Effectue une embauche aléatoire
+;; • nb-to-renew : nombre d'agents à embaucher
+to hire-same-proportions [nb-to-renew]
+  ;; Récupération des proportions des agents restants
+  let proportions []
+  let somme 0
+  foreach sort remove-duplicates [agent-type] of turtles
+  [
+    let temp (((count turtles with [agent-type = ?]) / (count turtles)) * 100)
+    set somme somme + temp
+    set proportions lput (list ? somme) proportions
   ]
 
-  ask turtles
+  ;; Embauche des agents
+  let temp 0
+  while [temp < nb-to-renew]
   [
-    let partenaire partner
-    if partenaire != nobody [
-      WorkAgent [leffort] of partenaire ]
-    ;;update-color-effort
+    let rand random 100
+    let to-add item 0 filter [item 1 ? > rand] proportions
+    RandAgent (item 0 to-add) 1
+    set temp temp + 1
   ]
-  ask turtles [set leffort effort]
 end
+
+
+
+
+
+
+
+
+
+
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 0
@@ -745,7 +836,7 @@ INPUTBOX
 122
 192
 nb-agents-0
-0
+400
 1
 0
 Number
@@ -756,7 +847,7 @@ INPUTBOX
 120
 287
 nb-agents-1
-0
+400
 1
 0
 Number
@@ -767,7 +858,7 @@ INPUTBOX
 119
 385
 nb-agents-2
-0
+161
 1
 0
 Number
@@ -778,7 +869,7 @@ INPUTBOX
 118
 487
 nb-agents-3
-961
+0
 1
 0
 Number
@@ -1334,11 +1425,216 @@ nb-ticks
 nb-ticks
 100
 10000
-800
+1100
 100
 1
 NIL
 HORIZONTAL
+
+TEXTBOX
+26
+1482
+176
+1506
+Améliorations
+18
+0.0
+1
+
+SWITCH
+29
+1513
+191
+1546
+ameliorations?
+ameliorations?
+0
+1
+-1000
+
+SLIDER
+191
+1513
+475
+1546
+pourcentage-renouvellement
+pourcentage-renouvellement
+0
+100
+8
+1
+1
+%
+HORIZONTAL
+
+SLIDER
+477
+1514
+724
+1547
+ecart-type-renouvellement
+ecart-type-renouvellement
+0.001
+2
+0.02
+0.001
+1
+NIL
+HORIZONTAL
+
+MONITOR
+30
+1577
+169
+1622
+#null effort
+count turtles with [agent-type = 0]
+17
+1
+11
+
+MONITOR
+30
+1621
+169
+1666
+#shrinking effort
+count turtles with [agent-type = 1]
+17
+1
+11
+
+MONITOR
+30
+1664
+169
+1709
+#replicator
+count turtles with [agent-type = 2]
+17
+1
+11
+
+MONITOR
+30
+1708
+169
+1753
+#rational
+count turtles with [agent-type = 3]
+17
+1
+11
+
+MONITOR
+30
+1753
+169
+1798
+#profit comparator
+count turtles with [agent-type = 4]
+17
+1
+11
+
+MONITOR
+188
+1576
+327
+1621
+#high effort
+count turtles with [agent-type = 5]
+17
+1
+11
+
+MONITOR
+188
+1618
+327
+1663
+#average rational
+count turtles with [agent-type = 6]
+17
+1
+11
+
+MONITOR
+188
+1664
+326
+1709
+#winner imitator
+count turtles with [agent-type = 7]
+17
+1
+11
+
+MONITOR
+187
+1709
+327
+1754
+#effort comparator
+count turtles with [agent-type = 8]
+17
+1
+11
+
+MONITOR
+187
+1753
+327
+1798
+#averager
+count turtles with [agent-type = 9]
+17
+1
+11
+
+CHOOSER
+742
+1512
+1039
+1557
+methode-renouvellement
+methode-renouvellement
+"Aleatoire" "Proportion des restants" "Proportion des restants avec bruit"
+1
+
+BUTTON
+359
+1582
+432
+1615
+NIL
+setup
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+437
+1582
+500
+1615
+NIL
+go
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
