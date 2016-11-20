@@ -675,24 +675,27 @@ end
 ;; ---
 ;; "Licencie" un certain pourcentage de la population et la remplace par de nouveaux agents
 to renouvellement
-  ifelse standard-deviation [effort] of turtles > ecart-type-renouvellement
+  if standard-deviation [effort] of turtles > ecart-type-renouvellement
   [
     ;; Calcul du nombre d'agents à renouveler
-    let nb-to-renew min (list (floor ((count turtles) * pourcentage-renouvellement / 100)) count turtles with [effort < mean [effort] of turtles])
+    let nb-to-renew min (list (floor ((count turtles) * pourcentage-renouvellement / 100)) (count turtles with [effort < mean [effort] of turtles]))
 
     ;; Suppression des agents les moins bons
     let temp nb-to-renew
+    ;; Application du bruit de détection de l'effort sur toutes les turtles
+    ask turtles [
+      set effort max(list min (list ((random fire-noise) * (one-of [-1 1]) * effort / 100) effort-max) effort-min)
+    ]
     while [temp > 0]
     [
-      ask one-of turtles with [ effort = min [effort] of turtles ] [ die ]
-      set temp temp - 1
+      let worst-agents turtles with [ effort = min [effort] of turtles ]
+      let nb min (list (count worst-agents) temp)
+      ask n-of nb worst-agents [ die ]
+      set temp temp - nb
     ]
 
     ;; Embauche du même nombre d'agents pour remplacer ceux supprimés
     hire nb-to-renew
-  ]
-  [
-    show "Personne n'a été viré"
   ]
 end
 
@@ -702,7 +705,7 @@ end
 ;; • nb-to-renew : nombre d'agents à embaucher
 to hire [nb-to-renew]
   if methode-renouvellement = "Aleatoire" [ hire-random nb-to-renew ]
-  if methode-renouvellement = "Proportion des restants" [ hire-same-proportions nb-to-renew ]
+  if methode-renouvellement = "Proportion des restants avec bruit" [ hire-same-proportions nb-to-renew ]
 end
 
 ;; hire-random
@@ -721,7 +724,7 @@ end
 
 ;; hire-random
 ;; ---
-;; Effectue une embauche aléatoire
+;; Effectue une embauche dans les mêmes proportions que la population courante, avec une probabilité "hire-noise" de se tromper et d'embaucher quelqu'un aléatoirement
 ;; • nb-to-renew : nombre d'agents à embaucher
 to hire-same-proportions [nb-to-renew]
   ;; Récupération des proportions des agents restants
@@ -735,16 +738,24 @@ to hire-same-proportions [nb-to-renew]
   ]
 
   ;; Embauche des agents
+  ;; Aléatoirement, hire-noise% du temps, on embauche quelqu'un aléatoirement et non selon les proportions...
   let temp 0
   while [temp < nb-to-renew]
   [
-    let rand random 100
-    let to-add item 0 filter [item 1 ? > rand] proportions
-    RandAgent (item 0 to-add) 1
+    ifelse random 100 < hire-noise
+    [
+      ;; Embauche aléatoire
+      hire-random 1
+    ]
+    [
+      ;; Embauche selon les proportions
+      let rand random 100
+      let to-add item 0 filter [item 1 ? > rand] proportions
+      RandAgent (item 0 to-add) 1
+    ]
     set temp temp + 1
   ]
 end
-
 
 
 
@@ -1349,7 +1360,7 @@ ecart-type-max
 ecart-type-max
 0.01
 0.5
-0.1
+0.01
 0.01
 1
 NIL
@@ -1476,7 +1487,7 @@ ecart-type-renouvellement
 ecart-type-renouvellement
 0.001
 2
-0.02
+0.2
 0.001
 1
 NIL
@@ -1593,13 +1604,13 @@ count turtles with [agent-type = 9]
 11
 
 CHOOSER
-742
-1512
-1039
-1557
+530
+1555
+827
+1600
 methode-renouvellement
 methode-renouvellement
-"Aleatoire" "Proportion des restants" "Proportion des restants avec bruit"
+"Aleatoire" "Proportion des restants avec bruit"
 1
 
 BUTTON
@@ -1635,6 +1646,36 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+531
+1615
+703
+1648
+hire-noise
+hire-noise
+0
+100
+1
+1
+1
+%
+HORIZONTAL
+
+SLIDER
+530
+1658
+702
+1691
+fire-noise
+fire-noise
+0
+100
+1
+1
+1
+%
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -1979,7 +2020,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3
+NetLogo 3D 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
