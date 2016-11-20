@@ -73,10 +73,7 @@ to setup
 end
 
 to go
-  ask turtles
-  [
-    RandMove
-  ]
+  ask turtles [ RandMove ]
 
   ask turtles
   [
@@ -85,14 +82,16 @@ to go
       WorkAgent [leffort] of partenaire ]
     update-color-effort
   ]
+
   ask turtles [set leffort effort]
+
+  display-color
 
   if ameliorations?
   [
     renouvellement
   ]
 
-  display-color
   tick
 end
 
@@ -684,7 +683,7 @@ to renouvellement
     let temp nb-to-renew
     ;; Application du bruit de détection de l'effort sur toutes les turtles
     ask turtles [
-      set effort max(list min (list ((random fire-noise) * (one-of [-1 1]) * effort / 100) effort-max) effort-min)
+      set effort max(list min (list ((100 - (random fire-noise) * (one-of [-1 1])) * effort / 100) effort-max) effort-min)
     ]
     while [temp > 0]
     [
@@ -704,8 +703,8 @@ end
 ;; Embauche les nouveaux agents selon la modalité voulue
 ;; • nb-to-renew : nombre d'agents à embaucher
 to hire [nb-to-renew]
-  if methode-renouvellement = "Aleatoire" [ hire-random nb-to-renew ]
-  if methode-renouvellement = "Proportion des restants avec bruit" [ hire-same-proportions nb-to-renew ]
+  if hire-method = "Aleatoire" [ hire-random nb-to-renew ]
+  if hire-method = "Proportion des restants avec bruit" [ hire-same-proportions nb-to-renew ]
 end
 
 ;; hire-random
@@ -1487,7 +1486,7 @@ ecart-type-renouvellement
 ecart-type-renouvellement
 0.001
 2
-0.2
+0.01
 0.001
 1
 NIL
@@ -1608,8 +1607,8 @@ CHOOSER
 1555
 827
 1600
-methode-renouvellement
-methode-renouvellement
+hire-method
+hire-method
 "Aleatoire" "Proportion des restants avec bruit"
 1
 
@@ -1656,7 +1655,7 @@ hire-noise
 hire-noise
 0
 100
-1
+15
 1
 1
 %
@@ -1671,7 +1670,7 @@ fire-noise
 fire-noise
 0
 100
-1
+5
 1
 1
 %
