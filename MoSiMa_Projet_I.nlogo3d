@@ -5,7 +5,6 @@ turtles-own [
   ;; • direction        : Direction vers laquelle l'agent regarde
   ;; • step             : "allowed motion"
   ;; • color-effort     : Couleur de l'effort
-  ;; • color-type       : Couleur du type
   ;; • evol             : Type d'évolution que l'agent à atteint (?)
   ;; • numinc           : nombre d'itérations
   ;;
@@ -25,7 +24,6 @@ turtles-own [
   direction
   step
   color-effort
-  color-type
   evol
   numinc
 
@@ -46,6 +44,9 @@ turtles-own [
 globals [
   effort-min
   effort-max
+  agent-types
+  agent-colors
+  agent-numbers
 ]
 
 to setup
@@ -53,23 +54,34 @@ to setup
   clear-patches
   clear-all-plots
 
-  set effort-min 0.0001
-  set effort-max 2.001
-
-  RandAgent 0 nb-agents-0
-  RandAgent 1 nb-agents-1
-  RandAgent 2 nb-agents-2
-  RandAgent 3 nb-agents-3
-  RandAgent 4 nb-agents-4
-  RandAgent 5 nb-agents-5
-  RandAgent 6 nb-agents-6
-  RandAgent 7 nb-agents-7
-  RandAgent 8 nb-agents-8
-  RandAgent 9 nb-agents-9
+  setup-globals
+  setup-agents
 
   display-color
 
   reset-ticks
+end
+
+;; setup-globals
+;; ---
+;; Assigne les variables globales à leur valeur correcte
+to setup-globals
+  set effort-min 0.0001
+  set effort-max 2.001
+
+  set agent-types [ 0 1 2 3 4 5 6 7 8 9 ]
+  set agent-colors [ gray red orange brown yellow green cyan blue magenta pink ]
+  set agent-numbers (list nb-agents-0 nb-agents-1 nb-agents-2 nb-agents-3 nb-agents-4 nb-agents-5 nb-agents-6 nb-agents-7 nb-agents-8 nb-agents-9 )
+end
+
+;; setup-agents
+;; ---
+;; Crée les agents selon les variables globales
+to setup-agents
+  foreach agent-types
+  [
+    RandAgent ? item ? agent-numbers
+  ]
 end
 
 to go
@@ -79,7 +91,8 @@ to go
   [
     let partenaire partner
     if partenaire != nobody [
-      WorkAgent [leffort] of partenaire ]
+      WorkAgent [leffort] of partenaire
+    ]
     update-color-effort
   ]
 
@@ -87,10 +100,7 @@ to go
 
   display-color
 
-  if ameliorations?
-  [
-    renouvellement
-  ]
+  if ameliorations? [ renouvellement ]
 
   tick
 end
@@ -113,12 +123,6 @@ to display-color
       ]
     ]
   ]
-
-  ;; Inutile car les agents ne changent pas de type pendant la simulation...
-;  ask turtles
-;  [
-;    set color color-type
-;  ]
 end
 
 ;; RandAgent
@@ -159,16 +163,7 @@ end
 ;; ---
 ;; set la couleur de l'agent à la couleur qui lui correspond
 to setup-color-agent
-  if agent-type = 0 [set color-type gray set color color-type]
-  if agent-type = 1 [set color-type red set color color-type]
-  if agent-type = 2 [set color-type orange set color color-type]
-  if agent-type = 3 [set color-type brown set color color-type]
-  if agent-type = 4 [set color-type yellow set color color-type]
-  if agent-type = 5 [set color-type green set color color-type]
-  if agent-type = 6 [set color-type cyan set color color-type]
-  if agent-type = 7 [set color-type blue set color color-type]
-  if agent-type = 8 [set color-type magenta set color color-type]
-  if agent-type = 9 [set color-type pink set color color-type]
+  set color item agent-type agent-colors
 end
 
 ;; setup-effort-agent
@@ -549,7 +544,7 @@ to-report launch-simulations-figs [ liste-pourcentages type-agent ]
     ;; setup
     let liste-nb-agents []
     ;; ajout du bon nombre d'agents voulu dans la liste
-    foreach [ 0 1 2 3 4 5 6 7 8 9 ]
+    foreach agent-types
     [
       ifelse ? = type-agent
       [ set liste-nb-agents lput (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) liste-nb-agents ]
@@ -590,8 +585,7 @@ to setup-simulate [ liste ]
   clear-turtles
   clear-patches
 
-  set effort-min 0.0001
-  set effort-max 2.001
+  setup-globals
 
   RandAgent 0 item 0 liste
   RandAgent 1 item 1 liste
@@ -791,7 +785,6 @@ end
 
 
 
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 0
@@ -823,10 +816,10 @@ ticks
 30.0
 
 BUTTON
-33
-630
-96
-663
+450
+793
+513
+826
 NIL
 setup
 NIL
@@ -840,10 +833,10 @@ NIL
 1
 
 BUTTON
-104
-630
-167
-663
+521
+793
+584
+826
 NIL
 go
 T
@@ -906,7 +899,7 @@ INPUTBOX
 118
 487
 nb-agents-3
-400
+0
 1
 0
 Number
@@ -917,7 +910,7 @@ INPUTBOX
 118
 589
 nb-agents-4
-0
+400
 1
 0
 Number
@@ -1105,10 +1098,10 @@ mean [effort] of turtles
 11
 
 PLOT
-25
-976
-782
-1437
+14
+1510
+771
+1971
 Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort
 Pourcentage d'agents high effort
 Effort Moyen
@@ -1122,10 +1115,10 @@ true
 PENS
 
 BUTTON
-25
-936
-115
-969
+14
+1470
+104
+1503
 Figure 6
 simulate-fig6
 NIL
@@ -1139,10 +1132,10 @@ NIL
 1
 
 TEXTBOX
-28
-832
-178
-854
+19
+1387
+169
+1409
 Simulations
 18
 0.0
@@ -1348,13 +1341,13 @@ standard-deviation [profit] of turtles
 11
 
 SLIDER
-25
-871
-204
-904
+16
+1426
+195
+1459
 min-nb-iterations
 min-nb-iterations
-10
+2
 1000
 200
 1
@@ -1363,10 +1356,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-214
-871
-396
-904
+205
+1426
+387
+1459
 max-nb-iterations
 max-nb-iterations
 500
@@ -1378,25 +1371,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-405
-871
-592
-904
+396
+1426
+583
+1459
 ecart-type-max
 ecart-type-max
-0.01
+0.001
 0.5
-0.01
-0.01
+0.1
+0.001
 1
 NIL
 HORIZONTAL
 
 BUTTON
-133
-936
-223
-969
+122
+1470
+212
+1503
 Figure 7
 simulate-fig7
 NIL
@@ -1410,10 +1403,10 @@ NIL
 1
 
 PLOT
-837
-975
-1552
-1436
+826
+1509
+1541
+1970
 Effet du bruit sur une population de winner-imitators
 Time
 Effort
@@ -1427,10 +1420,10 @@ true
 PENS
 
 BUTTON
-837
-934
-927
-967
+826
+1468
+916
+1501
 Figure 9
 simulate-noise
 NIL
@@ -1454,10 +1447,10 @@ Intensité du bruit :
 1
 
 SLIDER
-836
-891
-1008
-924
+825
+1425
+997
+1458
 nb-ticks
 nb-ticks
 100
@@ -1469,20 +1462,20 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-26
-1482
-176
-1506
+20
+849
+170
+873
 Améliorations
 18
 0.0
 1
 
 SWITCH
-29
-1513
-191
-1546
+23
+880
+185
+913
 ameliorations?
 ameliorations?
 1
@@ -1490,10 +1483,10 @@ ameliorations?
 -1000
 
 SLIDER
-191
-1513
-475
-1546
+185
+880
+469
+913
 pourcentage-renouvellement
 pourcentage-renouvellement
 0
@@ -1505,10 +1498,10 @@ pourcentage-renouvellement
 HORIZONTAL
 
 SLIDER
-477
-1514
-724
-1547
+471
+881
+718
+914
 ecart-type-renouvellement
 ecart-type-renouvellement
 0.001
@@ -1520,10 +1513,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-30
-1577
-169
-1622
+24
+944
+163
+989
 #null effort
 count turtles with [agent-type = 0]
 17
@@ -1531,10 +1524,10 @@ count turtles with [agent-type = 0]
 11
 
 MONITOR
-30
-1621
-169
-1666
+24
+988
+163
+1033
 #shrinking effort
 count turtles with [agent-type = 1]
 17
@@ -1542,10 +1535,10 @@ count turtles with [agent-type = 1]
 11
 
 MONITOR
-30
-1664
-169
-1709
+24
+1031
+163
+1076
 #replicator
 count turtles with [agent-type = 2]
 17
@@ -1553,10 +1546,10 @@ count turtles with [agent-type = 2]
 11
 
 MONITOR
-30
-1708
-169
-1753
+24
+1075
+163
+1120
 #rational
 count turtles with [agent-type = 3]
 17
@@ -1564,10 +1557,10 @@ count turtles with [agent-type = 3]
 11
 
 MONITOR
-30
-1753
-169
-1798
+24
+1120
+163
+1165
 #profit comparator
 count turtles with [agent-type = 4]
 17
@@ -1575,10 +1568,10 @@ count turtles with [agent-type = 4]
 11
 
 MONITOR
-188
-1576
-327
-1621
+182
+943
+321
+988
 #high effort
 count turtles with [agent-type = 5]
 17
@@ -1586,10 +1579,10 @@ count turtles with [agent-type = 5]
 11
 
 MONITOR
-188
-1618
-327
-1663
+182
+985
+321
+1030
 #average rational
 count turtles with [agent-type = 6]
 17
@@ -1597,10 +1590,10 @@ count turtles with [agent-type = 6]
 11
 
 MONITOR
-188
-1664
-326
-1709
+182
+1031
+320
+1076
 #winner imitator
 count turtles with [agent-type = 7]
 17
@@ -1608,10 +1601,10 @@ count turtles with [agent-type = 7]
 11
 
 MONITOR
-187
-1709
-327
-1754
+181
+1076
+321
+1121
 #effort comparator
 count turtles with [agent-type = 8]
 17
@@ -1619,10 +1612,10 @@ count turtles with [agent-type = 8]
 11
 
 MONITOR
-187
-1753
-327
-1798
+181
+1120
+321
+1165
 #averager
 count turtles with [agent-type = 9]
 17
@@ -1630,54 +1623,20 @@ count turtles with [agent-type = 9]
 11
 
 CHOOSER
-530
-1555
-875
-1600
+524
+922
+869
+967
 hire-method
 hire-method
 "Aleatoire" "Proportion des restants"
 1
 
-BUTTON
-359
-1582
-432
-1615
-NIL
-setup
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-437
-1582
-500
-1615
-NIL
-go
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
 SLIDER
-527
-1698
-699
-1731
+521
+1065
+693
+1098
 hire-noise
 hire-noise
 0
@@ -1689,10 +1648,10 @@ hire-noise
 HORIZONTAL
 
 SLIDER
-526
-1741
-698
-1774
+520
+1108
+692
+1141
 fire-noise
 fire-noise
 0
@@ -1704,10 +1663,10 @@ fire-noise
 HORIZONTAL
 
 SLIDER
-737
-1701
-909
-1734
+731
+1068
+903
+1101
 anciennete-min
 anciennete-min
 0
@@ -1719,10 +1678,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-737
-1736
-909
-1769
+731
+1103
+903
+1136
 anciennete-max
 anciennete-max
 0
@@ -1734,10 +1693,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-736
-1664
-865
-1697
+730
+1031
+859
+1064
 anciennete?
 anciennete?
 0
@@ -2087,7 +2046,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3.1
+NetLogo 3D 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
