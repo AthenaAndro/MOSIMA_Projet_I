@@ -677,25 +677,51 @@ to renouvellement
   if standard-deviation [effort] of turtles > ecart-type-renouvellement
   [
     ;; Calcul du nombre d'agents à renouveler
-    let nb-to-renew min (list (floor ((count turtles) * pourcentage-renouvellement / 100)) (count turtles with [effort < mean [effort] of turtles]))
+    let nb-to-renew 0
+    ifelse anciennete? = true
+    [
+      set nb-to-renew min (list (floor ((count turtles) * pourcentage-renouvellement / 100)) (count turtles with [ numinc > anciennete-min and numinc < anciennete-max] with-min [ effort ]))
+    ]
+    [
+      set nb-to-renew min (list (floor ((count turtles) * pourcentage-renouvellement / 100)) (count turtles with-min [ effort ]))
+    ]
 
     ;; Suppression des agents les moins bons
-    let temp nb-to-renew
-    ;; Application du bruit de détection de l'effort sur toutes les turtles
-    ask turtles [
-      set effort max(list min (list ((100 - (random fire-noise) * (one-of [-1 1])) * effort / 100) effort-max) effort-min)
-    ]
-    while [temp > 0]
-    [
-      let worst-agents turtles with [ effort = min [effort] of turtles ]
-      let nb min (list (count worst-agents) temp)
-      ask n-of nb worst-agents [ die ]
-      set temp temp - nb
-    ]
+    fire nb-to-renew
 
     ;; Embauche du même nombre d'agents pour remplacer ceux supprimés
     hire nb-to-renew
   ]
+end
+
+;; fire
+;; ---
+;; Licencie les agents les agents les moins bons selon la modalité voulue
+;; • nb-to-renew : nombre d'agents à licencier
+to fire [nb-to-renew]
+  let temp nb-to-renew
+    ;; Application du bruit de détection de l'effort sur toutes les turtles
+    ask turtles [
+      set effort max(list min (list ((100 - (random fire-noise) * (one-of [-1 1])) * effort / 100) effort-max) effort-min)
+    ]
+    ;; "while" pour licencier le bon nombre d'agents
+    while [temp > 0]
+    [
+      ;; Sélection des agents à licencier
+      let worst-agents turtles
+      ifelse anciennete? = true
+      [
+        set worst-agents turtles with [ numinc > anciennete-min and numinc < anciennete-max] with-min [ effort ]
+      ]
+      [
+        set worst-agents turtles with-min [ effort ]
+      ]
+      let nb min (list (count worst-agents) temp)
+
+      ;; Licenciement
+      ask n-of nb worst-agents [ die ]
+      set temp temp - nb
+    ]
 end
 
 ;; hire
@@ -704,7 +730,7 @@ end
 ;; • nb-to-renew : nombre d'agents à embaucher
 to hire [nb-to-renew]
   if hire-method = "Aleatoire" [ hire-random nb-to-renew ]
-  if hire-method = "Proportion des restants avec bruit" [ hire-same-proportions nb-to-renew ]
+  if hire-method = "Proportion des restants" [ hire-same-proportions nb-to-renew ]
 end
 
 ;; hire-random
@@ -755,8 +781,6 @@ to hire-same-proportions [nb-to-renew]
     set temp temp + 1
   ]
 end
-
-
 
 
 
@@ -1344,7 +1368,7 @@ max-nb-iterations
 max-nb-iterations
 500
 50000
-50000
+45500
 100
 1
 NIL
@@ -1471,7 +1495,7 @@ pourcentage-renouvellement
 pourcentage-renouvellement
 0
 100
-8
+2
 1
 1
 %
@@ -1486,7 +1510,7 @@ ecart-type-renouvellement
 ecart-type-renouvellement
 0.001
 2
-0.01
+0.04
 0.001
 1
 NIL
@@ -1605,12 +1629,12 @@ count turtles with [agent-type = 9]
 CHOOSER
 530
 1555
-827
+875
 1600
 hire-method
 hire-method
-"Aleatoire" "Proportion des restants avec bruit"
-1
+"Aleatoire" "Proportion des restants"
+0
 
 BUTTON
 359
@@ -1647,10 +1671,10 @@ NIL
 1
 
 SLIDER
-531
-1615
-703
-1648
+527
+1698
+699
+1731
 hire-noise
 hire-noise
 0
@@ -1662,10 +1686,10 @@ hire-noise
 HORIZONTAL
 
 SLIDER
-530
-1658
-702
-1691
+526
+1741
+698
+1774
 fire-noise
 fire-noise
 0
@@ -1675,6 +1699,47 @@ fire-noise
 1
 %
 HORIZONTAL
+
+SLIDER
+737
+1701
+909
+1734
+anciennete-min
+anciennete-min
+0
+100
+10
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+737
+1736
+909
+1769
+anciennete-max
+anciennete-max
+0
+1000
+400
+1
+1
+NIL
+HORIZONTAL
+
+SWITCH
+736
+1664
+865
+1697
+anciennete?
+anciennete?
+0
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
