@@ -807,6 +807,7 @@ end
 ;; Fait changer le type d'un agent selon l'effort qu'il aura fournit
 ;; et le profit qu'il aura obtenu
 to change-poste
+  if not change-poste? [ stop ]
   if effort > aeffort and profit < aprofit and random 100 <= change-poste-pourcent
   [
     ;; TODO
