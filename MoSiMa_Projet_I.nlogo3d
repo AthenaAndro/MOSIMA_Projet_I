@@ -47,6 +47,7 @@ globals [
   agent-types
   agent-colors
   agent-numbers
+  nb-type-agents
 ]
 
 to setup
@@ -68,6 +69,8 @@ end
 to setup-globals
   set effort-min 0.0001
   set effort-max 2.001
+
+  set nb-type-agents 9
 
   set agent-types [ 0 1 2 3 4 5 6 7 8 9 ]
   set agent-colors [ gray red orange brown yellow green cyan blue magenta pink ]
@@ -684,11 +687,14 @@ to renouvellement
       set nb-to-renew min (list (floor ((count turtles) * pourcentage-renouvellement / 100)) (count turtles with-min [ effort ]))
     ]
 
+    ;; Calcul du nombre de démission
+    let nb-demission retraite
+
     ;; Suppression des agents les moins bons
     fire nb-to-renew
 
     ;; Embauche du même nombre d'agents pour remplacer ceux supprimés
-    hire nb-to-renew
+    hire (nb-to-renew + nb-demission)
   ]
 end
 
@@ -780,10 +786,44 @@ to hire-same-proportions [nb-to-renew]
   ]
 end
 
+;; retraite
+;; ---
+;; Fait partir les agents à la retraite, s'il ont atteind l'âge,
+;; Avec une certaine propabilité, certains agents peuvent quitter l'entreprise
+;; en milieu de carrière
+to-report retraite
+  if not retraite? [ report 0 ]
 
+  let liste turtles with [ numinc > age-retraite or random 100 >= demission-pourcent ]
 
+  ask liste
+  [ die ]
 
+  report count liste
+end
 
+;; change-poste
+;; ---
+;; Fait changer le type d'un agent selon l'effort qu'il aura fournit
+;; et le profit qu'il aura obtenu
+to change-poste
+  if effort > aeffort and profit < aprofit and random 100 <= change-poste-pourcent
+  [
+    ;; TODO
+    ;; Il faut choisir le nouveau type de l'agent de façon
+    ;; "intelligente"
+    set agent-type max (list (agent-type - 1) 0)
+    stop
+  ]
+  if effort < aeffort and profit > aprofit and random 100 <= change-poste-pourcent
+  [
+    ;; TODO
+    ;; Il faut choisir le nouveau type de l'agent de façon
+    ;; "intelligente"
+    set agent-type min (list (agent-type + 1) nb-type-agents)
+    stop
+  ]
+end
 
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1633,10 +1673,10 @@ hire-method
 1
 
 SLIDER
-521
-1065
-693
-1098
+343
+926
+515
+959
 hire-noise
 hire-noise
 0
@@ -1648,10 +1688,10 @@ hire-noise
 HORIZONTAL
 
 SLIDER
-520
-1108
-692
-1141
+342
+969
+514
+1002
 fire-noise
 fire-noise
 0
@@ -1702,6 +1742,73 @@ anciennete?
 0
 1
 -1000
+
+SWITCH
+989
+1034
+1092
+1067
+retraite?
+retraite?
+1
+1
+-1000
+
+SLIDER
+989
+1069
+1161
+1102
+age-retraite
+age-retraite
+300
+1000
+700
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+990
+1105
+1207
+1138
+demission-pourcent
+demission-pourcent
+0
+100
+3
+1
+1
+%
+HORIZONTAL
+
+SWITCH
+1275
+1027
+1439
+1060
+change-poste?
+change-poste?
+1
+1
+-1000
+
+SLIDER
+1275
+1065
+1519
+1098
+change-poste-pourcent
+change-poste-pourcent
+0
+100
+1
+1
+1
+%
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
