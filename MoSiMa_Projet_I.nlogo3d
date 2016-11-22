@@ -436,6 +436,7 @@ end
 ;; ---
 ;; Lance une batterie de simulation pour créer un plot des résultats similaires à la figure 6 de l'article
 to simulate-fig6
+  setup
   let name-of-plot "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
   ;; Initialisation de la liste des efforts attendus (l'équilibre de Nash pour chaque pourcentage de high effort)
   let liste-plot-expected (list (list 0 0.92101) (list 0.6 0.92701) (list 5.6 0.98101)  (list 33.3 1.28100)  (list 66.7 1.64100) (list 100 2.00100) )
@@ -474,6 +475,7 @@ end
 ;; ---
 ;; Lance une batterie de simulation pour créer un plot des résultats similaires à la figure 7 de l'article
 to simulate-fig7
+  setup
   let name-of-plot "Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"
   ;; Initialisation de la liste des efforts attendus (l'équilibre de Nash pour chaque pourcentage de high effort)
   let liste-plot-expected (list (list 0 0.92101) (list 0.6 0.92701) (list 5.6 0.98101)  (list 33.3 1.28100)  (list 66.7 1.64100) (list 100 2.00100) )
@@ -675,10 +677,15 @@ end
 ;; ---
 ;; "Licencie" un certain pourcentage de la population et la remplace par de nouveaux agents
 to renouvellement
-  if standard-deviation [effort] of turtles > ecart-type-renouvellement
+  ;; Calcul du nombre d'agents à renouveler
+  let nb-to-renew 0
+  ;; Calcul du nombre de démission
+  let nb-demission retraite
+
+  ;; Licenciement des agents les moins bons
+  if count turtles > 1 and standard-deviation [effort] of turtles > ecart-type-renouvellement
   [
-    ;; Calcul du nombre d'agents à renouveler
-    let nb-to-renew 0
+    ;; Prise en compte de l'ancienneté
     ifelse anciennete? = true
     [
       set nb-to-renew min (list (floor ((count turtles) * pourcentage-renouvellement / 100)) (count turtles with [ numinc > anciennete-min and numinc < anciennete-max] with-min [ effort ]))
@@ -687,15 +694,12 @@ to renouvellement
       set nb-to-renew min (list (floor ((count turtles) * pourcentage-renouvellement / 100)) (count turtles with-min [ effort ]))
     ]
 
-    ;; Calcul du nombre de démission
-    let nb-demission retraite
-
     ;; Suppression des agents les moins bons
     fire nb-to-renew
-
-    ;; Embauche du même nombre d'agents pour remplacer ceux supprimés
-    hire (nb-to-renew + nb-demission)
   ]
+
+  ;; Embauche du même nombre d'agents pour remplacer ceux supprimés
+  hire (nb-to-renew + nb-demission)
 end
 
 ;; fire
@@ -733,8 +737,11 @@ end
 ;; Embauche les nouveaux agents selon la modalité voulue
 ;; • nb-to-renew : nombre d'agents à embaucher
 to hire [nb-to-renew]
-  if hire-method = "Aleatoire" [ hire-random nb-to-renew ]
-  if hire-method = "Proportion des restants" [ hire-same-proportions nb-to-renew ]
+  ifelse count turtles = 0 [ hire-random nb-to-renew ]
+  [
+    if hire-method = "Aleatoire" [ hire-random nb-to-renew ]
+    if hire-method = "Proportion des restants" [ hire-same-proportions nb-to-renew ]
+  ]
 end
 
 ;; hire-random
@@ -794,17 +801,17 @@ end
 to-report retraite
   if not retraite? [ report 0 ]
 
-  let liste turtles with [ numinc > age-retraite or random 100 >= demission-pourcent ]
+  let liste turtles with [ numinc > age-retraite or random 100 < demission-pourcent ]
+  let nb count liste
 
   ask liste
-  [ die ]
-
-  report count liste
+  [ show self die ]
+  report nb
 end
 
 ;; change-poste
 ;; ---
-;; Fait changer le type d'un agent selon l'effort qu'il aura fournit
+;; Fait changer le type d'un agent selon l'effort qu'il aura fourni
 ;; et le profit qu'il aura obtenu
 to change-poste
   if not change-poste? [ stop ]
@@ -939,7 +946,7 @@ INPUTBOX
 118
 487
 nb-agents-3
-400
+2
 1
 0
 Number
@@ -1518,7 +1525,7 @@ SWITCH
 913
 ameliorations?
 ameliorations?
-1
+0
 1
 -1000
 
@@ -1546,7 +1553,7 @@ ecart-type-renouvellement
 ecart-type-renouvellement
 0.001
 2
-0.04
+0.001
 0.001
 1
 NIL
@@ -1750,7 +1757,7 @@ SWITCH
 1067
 retraite?
 retraite?
-1
+0
 1
 -1000
 
@@ -1763,7 +1770,7 @@ age-retraite
 age-retraite
 300
 1000
-700
+1000
 1
 1
 NIL
@@ -1778,7 +1785,7 @@ demission-pourcent
 demission-pourcent
 0
 100
-3
+100
 1
 1
 %
@@ -2153,7 +2160,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3.1
+NetLogo 3D 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
