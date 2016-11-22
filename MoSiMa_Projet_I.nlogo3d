@@ -547,7 +547,7 @@ to-report launch-simulations-figs [ liste-pourcentages type-agent ]
     ;; setup
     let liste-nb-agents []
     ;; ajout du bon nombre d'agents voulu dans la liste
-    foreach agent-types
+    foreach [ 0 1 2 3 4 5 6 7 8 9 ]
     [
       ifelse ? = type-agent
       [ set liste-nb-agents lput (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) liste-nb-agents ]
@@ -825,7 +825,6 @@ to change-poste
     stop
   ]
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 0
@@ -940,7 +939,7 @@ INPUTBOX
 118
 487
 nb-agents-3
-0
+400
 1
 0
 Number
@@ -951,7 +950,7 @@ INPUTBOX
 118
 589
 nb-agents-4
-400
+0
 1
 0
 Number
@@ -1532,7 +1531,7 @@ pourcentage-renouvellement
 pourcentage-renouvellement
 0
 100
-3
+0
 1
 1
 %
@@ -1740,7 +1739,7 @@ SWITCH
 1064
 anciennete?
 anciennete?
-0
+1
 1
 -1000
 
@@ -2154,7 +2153,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3
+NetLogo 3D 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
