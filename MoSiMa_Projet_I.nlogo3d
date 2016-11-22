@@ -609,6 +609,7 @@ end
 ;; Lance une batterie de simulation pour créer un plot des résultats similaires à la figure 9 de l'article
 ;; Cette figure donnait l'évolution de l'effort dans une population homogène de winner-imitators en fonction du bruit
 to simulate-noise
+  setup
   ;; Initialisation de variables
   let name-of-plot "Effet du bruit sur une population de winner-imitators"
   let counter 0
@@ -805,7 +806,7 @@ to-report retraite
   let nb count liste
 
   ask liste
-  [ show self die ]
+  [ die ]
   report nb
 end
 
@@ -1525,7 +1526,7 @@ SWITCH
 913
 ameliorations?
 ameliorations?
-0
+1
 1
 -1000
 
@@ -2160,7 +2161,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3
+NetLogo 3D 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
