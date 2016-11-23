@@ -1555,10 +1555,10 @@ ameliorations?
 -1000
 
 SLIDER
-185
-880
-469
-913
+364
+914
+648
+947
 pourcentage-renouvellement
 pourcentage-renouvellement
 0
@@ -1570,10 +1570,10 @@ pourcentage-renouvellement
 HORIZONTAL
 
 SLIDER
-471
-881
-718
-914
+650
+915
+897
+948
 ecart-type-renouvellement
 ecart-type-renouvellement
 0.001
@@ -1695,20 +1695,20 @@ count turtles with [agent-type = 9]
 11
 
 CHOOSER
-524
-922
-869
-967
+542
+955
+887
+1000
 hire-method
 hire-method
 "Aleatoire" "Proportion des restants"
 1
 
 SLIDER
-343
-926
-515
+361
 959
+533
+992
 hire-noise
 hire-noise
 0
@@ -1720,10 +1720,10 @@ hire-noise
 HORIZONTAL
 
 SLIDER
-342
-969
-514
+360
 1002
+532
+1035
 fire-noise
 fire-noise
 0
@@ -1735,10 +1735,10 @@ fire-noise
 HORIZONTAL
 
 SLIDER
-731
-1068
-903
-1101
+368
+1153
+540
+1186
 anciennete-min
 anciennete-min
 0
@@ -1750,10 +1750,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-731
-1103
-903
-1136
+368
+1188
+540
+1221
 anciennete-max
 anciennete-max
 0
@@ -1765,10 +1765,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-730
-1031
-859
-1064
+367
+1116
+496
+1149
 anciennete?
 anciennete?
 1
@@ -1776,10 +1776,10 @@ anciennete?
 -1000
 
 SWITCH
-989
-1034
-1092
-1067
+626
+1119
+729
+1152
 retraite?
 retraite?
 1
@@ -1787,10 +1787,10 @@ retraite?
 -1000
 
 SLIDER
-989
-1069
-1161
-1102
+626
+1154
+798
+1187
 age-retraite
 age-retraite
 300
@@ -1802,10 +1802,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-990
-1105
-1207
-1138
+627
+1190
+844
+1223
 demission-pourcent
 demission-pourcent
 0
@@ -1817,10 +1817,10 @@ demission-pourcent
 HORIZONTAL
 
 SWITCH
-1275
-1027
-1439
-1060
+912
+1112
+1076
+1145
 change-poste?
 change-poste?
 1
@@ -1828,10 +1828,10 @@ change-poste?
 -1000
 
 SLIDER
-1275
-1065
-1563
-1098
+912
+1150
+1200
+1183
 change-poste-pourcent
 change-poste-pourcent
 0
@@ -1843,15 +1843,55 @@ change-poste-pourcent
 HORIZONTAL
 
 SWITCH
-1274
-1107
-1394
-1140
+911
+1192
+1031
+1225
 by-ranking?
 by-ranking?
 0
 1
 -1000
+
+TEXTBOX
+364
+882
+671
+902
+\"Renouvellement\" des moins bons éléments
+14
+0.0
+1
+
+TEXTBOX
+367
+1058
+517
+1092
+Prise en compte de l'ancienneté
+14
+0.0
+1
+
+TEXTBOX
+625
+1057
+844
+1115
+Prise en compte de départs à la retraites et de démissions spontanées
+14
+0.0
+1
+
+TEXTBOX
+913
+1053
+1063
+1104
+Changement de type selon rapport profit/effort
+14
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -2196,7 +2236,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3
+NetLogo 3D 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
