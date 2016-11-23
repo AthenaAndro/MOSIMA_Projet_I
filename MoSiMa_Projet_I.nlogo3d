@@ -48,6 +48,8 @@ globals [
   agent-colors
   agent-numbers
   nb-type-agents
+
+  ranking
 ]
 
 to setup
@@ -70,11 +72,14 @@ to setup-globals
   set effort-min 0.0001
   set effort-max 2.001
 
-  set nb-type-agents 9
+  set nb-type-agents 10
 
   set agent-types [ 0 1 2 3 4 5 6 7 8 9 ]
   set agent-colors [ gray red orange brown yellow green cyan blue magenta pink ]
   set agent-numbers (list nb-agents-0 nb-agents-1 nb-agents-2 nb-agents-3 nb-agents-4 nb-agents-5 nb-agents-6 nb-agents-7 nb-agents-8 nb-agents-9 )
+
+  ;; Classement des agents en fonction de leur capacité de travail (arbitraire)
+  set ranking [0 1 2 7 9 8 4 6 3 5]
 end
 
 ;; setup-agents
@@ -103,7 +108,11 @@ to go
 
   display-color
 
-  if ameliorations? [ renouvellement ]
+  if ameliorations?
+  [
+    renouvellement
+    change-poste
+  ]
 
   tick
 end
@@ -816,21 +825,36 @@ end
 ;; et le profit qu'il aura obtenu
 to change-poste
   if not change-poste? [ stop ]
-  if effort > aeffort and profit < aprofit and random 100 <= change-poste-pourcent
+
+  ask turtles
   [
-    ;; TODO
-    ;; Il faut choisir le nouveau type de l'agent de façon
-    ;; "intelligente"
-    set agent-type max (list (agent-type - 1) 0)
-    stop
-  ]
-  if effort < aeffort and profit > aprofit and random 100 <= change-poste-pourcent
-  [
-    ;; TODO
-    ;; Il faut choisir le nouveau type de l'agent de façon
-    ;; "intelligente"
-    set agent-type min (list (agent-type + 1) nb-type-agents)
-    stop
+    ;; Trop d'effort pour moins de profit
+    ;; l'agent baisse sa quantité de travail
+    let tmp random 10000
+    if effort > aeffort and profit < aprofit and tmp < change-poste-pourcent
+    [
+      ;; Version Ranking vs Aléatoire
+      ifelse by-ranking?
+      [
+        if agent-type = item 0 ranking [ stop ] ;; Ne peut pas être moins bosseur
+        set agent-type item random agent-type ranking
+      ]
+      [ set agent-type random nb-type-agents ]
+    ]
+
+    ;; Peu d'effort et peu de profit
+    ;; l'agent augmente sa quantité de travail
+    if effort < aeffort and profit < aprofit and tmp < change-poste-pourcent
+    [
+      ;; Version Ranking vs Aléatoire
+      ifelse by-ranking?
+      [
+        ;; Version avec ranking
+        if agent-type = item (nb-type-agents - 1) ranking [ stop ] ;; Ne peut pas être plus bosseur
+        set agent-type item ((nb-type-agents - 1) - random ((nb-type-agents - 1) - item agent-type ranking)) ranking
+      ]
+      [ set agent-type random nb-type-agents ]
+    ]
   ]
 end
 @#$#@#$#@
@@ -947,7 +971,7 @@ INPUTBOX
 118
 487
 nb-agents-3
-2
+200
 1
 0
 Number
@@ -969,7 +993,7 @@ INPUTBOX
 281
 191
 nb-agents-5
-0
+761
 1
 0
 Number
@@ -1758,7 +1782,7 @@ SWITCH
 1067
 retraite?
 retraite?
-0
+1
 1
 -1000
 
@@ -1806,17 +1830,28 @@ change-poste?
 SLIDER
 1275
 1065
-1519
+1563
 1098
 change-poste-pourcent
 change-poste-pourcent
 0
-100
+10000
+30
 1
 1
-1
-%
+% x 100
 HORIZONTAL
+
+SWITCH
+1274
+1107
+1394
+1140
+by-ranking?
+by-ranking?
+0
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -2161,7 +2196,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3.1
+NetLogo 3D 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
