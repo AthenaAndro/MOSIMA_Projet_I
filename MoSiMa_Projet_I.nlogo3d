@@ -251,29 +251,41 @@ to WorkAgent [parteff]
   ;; set leffort effort
 
   ;; Mise à jour de l'effort selon le type d'agent
+  ;; ---
+
+  ;; Shrinking Effort
   if agent-type = 1 [ set effort aeffort / 2 ]
+
+  ;; Replicator
   if agent-type = 2 [ set effort aeffort ]
+
+  ;; Rational
   if agent-type = 3
   [
     set effort best-reply-cardan aeffort
-    ;; Newton se fait la plupart du temps en moins de 20 itérations,
-    ;; pour un profit très proche du best-reply deterministe, parfoit même meilleur
-    ;let tmp best-reply-newton aeffort
-    ;show (list effort aeffort (calculate-profit effort aeffort) (calculate-profit first tmp aeffort) last tmp )
-    ]
+  ]
 
+  ;; Profit Comparator
   if agent-type = 4 [
     ifelse profit > aprofit [ set effort leffort * 1.1 ]; set effort min (list (effort * 1.1) effort-max) ]
     [ set effort leffort * 0.9 ]
   ]
+
+  ;; Average Rational
   if agent-type = 6 [ set effort best-reply-cardan (cumeffort / numinc) ]
+
+  ;; Winner Imitator
   if agent-type = 7 [
     if profit < aprofit [ set effort aeffort ]
   ]
+
+  ;; Effort Comparator
   if agent-type = 8 [
     ifelse leffort < aeffort [ set effort leffort * 1.1 ]; set effort min (list (effort * 1.1) effort-max) ]
     [ set effort effort * 0.9 ]
   ]
+
+  ;; Averager
   if agent-type = 9 [ set effort mean (list effort aeffort) ]
 
 
@@ -928,7 +940,7 @@ SWITCH
 120
 display-effort
 display-effort
-0
+1
 1
 -1000
 
@@ -938,7 +950,7 @@ INPUTBOX
 122
 192
 nb-agents-0
-0
+200
 1
 0
 Number
@@ -949,7 +961,7 @@ INPUTBOX
 120
 287
 nb-agents-1
-0
+200
 1
 0
 Number
@@ -960,7 +972,7 @@ INPUTBOX
 119
 385
 nb-agents-2
-0
+200
 1
 0
 Number
@@ -982,7 +994,7 @@ INPUTBOX
 118
 589
 nb-agents-4
-0
+161
 1
 0
 Number
@@ -993,7 +1005,7 @@ INPUTBOX
 281
 191
 nb-agents-5
-761
+0
 1
 0
 Number
@@ -1550,35 +1562,35 @@ SWITCH
 913
 ameliorations?
 ameliorations?
-0
+1
 1
 -1000
 
 SLIDER
-364
-914
-648
-947
+367
+911
+651
+944
 pourcentage-renouvellement
 pourcentage-renouvellement
 0
 100
-0
+10
 1
 1
 %
 HORIZONTAL
 
 SLIDER
-650
-915
-897
-948
+653
+912
+900
+945
 ecart-type-renouvellement
 ecart-type-renouvellement
 0.001
 2
-0.001
+0.1
 0.001
 1
 NIL
@@ -1695,40 +1707,40 @@ count turtles with [agent-type = 9]
 11
 
 CHOOSER
-542
-955
-887
-1000
+545
+952
+890
+997
 hire-method
 hire-method
 "Aleatoire" "Proportion des restants"
 1
 
 SLIDER
-361
-959
-533
-992
+364
+956
+536
+989
 hire-noise
 hire-noise
 0
 100
-15
+10
 1
 1
 %
 HORIZONTAL
 
 SLIDER
-360
-1002
-532
-1035
+363
+999
+535
+1032
 fire-noise
 fire-noise
 0
 100
-0
+5
 1
 1
 %
@@ -1856,7 +1868,7 @@ by-ranking?
 TEXTBOX
 364
 882
-671
+678
 902
 \"Renouvellement\" des moins bons éléments
 14
@@ -2236,7 +2248,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3.1
+NetLogo 3D 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
