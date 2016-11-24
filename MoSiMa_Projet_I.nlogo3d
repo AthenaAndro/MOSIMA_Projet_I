@@ -267,8 +267,8 @@ to WorkAgent [parteff]
 
   ;; Profit Comparator
   if agent-type = 4 [
-    ifelse profit > aprofit [ set effort leffort * 1.1 ]; set effort min (list (effort * 1.1) effort-max) ]
-    [ set effort leffort * 0.9 ]
+    ifelse profit > aprofit [ set effort min (list (leffort * 1.1) effort-max) ] ; set effort leffort * 1.1 ]
+    [ set effort max (list (leffort * 0.9) effort-min) ] ; set effort leffort * 0.9
   ]
 
   ;; Average Rational
@@ -281,12 +281,12 @@ to WorkAgent [parteff]
 
   ;; Effort Comparator
   if agent-type = 8 [
-    ifelse leffort < aeffort [ set effort leffort * 1.1 ]; set effort min (list (effort * 1.1) effort-max) ]
-    [ set effort effort * 0.9 ]
+    ifelse leffort < aeffort [ set effort min (list (leffort * 1.1) effort-max) ] ; set effort leffort * 1.1 ]
+    [ set effort max (list (leffort * 0.9) effort-min) ] ; set effort leffort * 0.9
   ]
 
   ;; Averager
-  if agent-type = 9 [ set effort mean (list effort aeffort) ]
+  if agent-type = 9 [ set effort ((leffort + aeffort) / 2) ]
 
 
 end
@@ -451,6 +451,8 @@ to do-plotting [ nom liste ]
     ;set-current-plot-pen (word first ? " point")
     ;foreach last ? [ plotxy first ? last ? ]
   ]
+  export-interface "interface.png"
+  export-plot nom (word nom ".csv")
 end
 
 ;; simulate-fig6
@@ -873,8 +875,8 @@ end
 GRAPHICS-WINDOW
 0
 0
-413
-434
+245
+239
 -1
 -1
 13.0
@@ -888,9 +890,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-30
+15
 0
-30
+15
 0
 0
 1
@@ -940,7 +942,7 @@ SWITCH
 120
 display-effort
 display-effort
-1
+0
 1
 -1000
 
@@ -950,7 +952,7 @@ INPUTBOX
 122
 192
 nb-agents-0
-200
+0
 1
 0
 Number
@@ -961,7 +963,7 @@ INPUTBOX
 120
 287
 nb-agents-1
-200
+0
 1
 0
 Number
@@ -972,7 +974,7 @@ INPUTBOX
 119
 385
 nb-agents-2
-200
+0
 1
 0
 Number
@@ -983,7 +985,7 @@ INPUTBOX
 118
 487
 nb-agents-3
-200
+0
 1
 0
 Number
@@ -994,7 +996,7 @@ INPUTBOX
 118
 589
 nb-agents-4
-161
+0
 1
 0
 Number
@@ -1027,7 +1029,7 @@ INPUTBOX
 278
 384
 nb-agents-7
-0
+961
 1
 0
 Number
@@ -1057,7 +1059,7 @@ Number
 PLOT
 590
 53
-1134
+1133
 203
 Moyenne et Ecart-type Effort global
 Time
@@ -1140,7 +1142,7 @@ SWITCH
 340
 noise?
 noise?
-1
+0
 1
 -1000
 
@@ -1153,7 +1155,7 @@ noise-value
 noise-value
 1
 50
-26
+1
 1
 1
 %
@@ -1433,7 +1435,7 @@ min-nb-iterations
 min-nb-iterations
 2
 1000
-200
+50
 1
 1
 NIL
@@ -1448,7 +1450,7 @@ max-nb-iterations
 max-nb-iterations
 500
 50000
-43700
+50000
 100
 1
 NIL
@@ -1463,7 +1465,7 @@ ecart-type-max
 ecart-type-max
 0.001
 0.5
-0.1
+0.02
 0.001
 1
 NIL
