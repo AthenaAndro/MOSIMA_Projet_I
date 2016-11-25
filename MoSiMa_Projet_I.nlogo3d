@@ -244,11 +244,12 @@ to WorkAgent [parteff]
 
   ;; Mise à jour des variables en fonction de l'effort du partenaire
   set-aeffort parteff
+  set neffort mean [ leffort ] of turtles in-radius neighborhood-radius
+  if neighborhood? [ set-aeffort neffort ]
   set profit calculate-profit leffort aeffort
   set cumprof (cumprof + profit)
   set cumeffort cumeffort + aeffort
   set aprofit calculate-profit aeffort leffort
-  ;; set leffort effort
 
   ;; Mise à jour de l'effort selon le type d'agent
   ;; ---
@@ -875,8 +876,8 @@ end
 GRAPHICS-WINDOW
 0
 0
-245
-239
+413
+434
 -1
 -1
 13.0
@@ -890,9 +891,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-15
+30
 0
-15
+30
 0
 0
 1
@@ -952,7 +953,7 @@ INPUTBOX
 122
 192
 nb-agents-0
-0
+100
 1
 0
 Number
@@ -1029,7 +1030,7 @@ INPUTBOX
 278
 384
 nb-agents-7
-961
+861
 1
 0
 Number
@@ -1142,7 +1143,7 @@ SWITCH
 340
 noise?
 noise?
-0
+1
 1
 -1000
 
@@ -1577,7 +1578,7 @@ pourcentage-renouvellement
 pourcentage-renouvellement
 0
 100
-10
+0
 1
 1
 %
@@ -1906,6 +1907,42 @@ Changement de type selon rapport profit/effort
 14
 0.0
 1
+
+TEXTBOX
+981
+885
+1131
+903
+Voisinage
+14
+0.0
+1
+
+SWITCH
+971
+911
+1122
+944
+neighborhood?
+neighborhood?
+1
+1
+-1000
+
+SLIDER
+972
+957
+1160
+990
+neighborhood-radius
+neighborhood-radius
+1
+max (list max-pxcor max-pycor)
+5
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -2250,7 +2287,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3
+NetLogo 3D 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
