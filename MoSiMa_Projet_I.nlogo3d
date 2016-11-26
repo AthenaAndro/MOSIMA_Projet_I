@@ -530,7 +530,7 @@ end
 ;; Effectue la simulation tant que l'écart-type des 200 dernières itérations n'est pas inférieur à la précision voulue : ecart-type-max
 to core-simulate
   let counter 0
-  let tampon (list (mean [effort] of turtles) )
+  let tampon (list (mean [leffort] of turtles) )
   ;; • Au moins min-nb-iterations itération
   ;; • Tant que la moyenne de la moyenne des efforts des agents durant min-nb-iterations dernières itérations
   ;; • est supérieure à ecart-type-max
@@ -540,10 +540,10 @@ to core-simulate
       go-simulate
       ifelse counter > min-nb-iterations
       [
-        set tampon lput (mean [effort] of turtles) tampon
+        set tampon lput (mean [leffort] of turtles) tampon
       ]
       [
-        set tampon remove 0 (lput (mean [effort] of turtles) tampon)
+        set tampon remove 0 (lput (mean [leffort] of turtles) tampon)
       ]
       set counter counter + 1
     ]
@@ -554,7 +554,7 @@ to core-simulate
     show (word "Simulation d'agents de type " other-type " avec " ((count turtles with [agent-type = 5] / count turtles) * 100) " % de high effort") ]
   [ show (word "Simulation avec 100 % de high effort") ]
   show (word "Nombre d'itération " counter)
-  show (word "Moyenne d'effort fourni par les agents : " (mean [effort] of turtles))
+  show (word "Moyenne d'effort fourni par les agents : " (mean [leffort] of turtles))
 end
 
 ;; launch-simulations-figs
@@ -871,6 +871,13 @@ to change-poste
       [ set agent-type random nb-type-agents ]
     ]
   ]
+end
+
+;; print-interface
+;; ---
+;; Exporte l'interface sous forme d'image png
+to print-interface
+  export-interface "interface.png"
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -1944,6 +1951,23 @@ max (list max-pxcor max-pycor)
 NIL
 HORIZONTAL
 
+BUTTON
+26
+1188
+341
+1353
+Capture d'écran
+print-interface
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
 @#$#@#$#@
 ## WHAT IS IT?
 
@@ -2287,7 +2311,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3.1
+NetLogo 3D 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
