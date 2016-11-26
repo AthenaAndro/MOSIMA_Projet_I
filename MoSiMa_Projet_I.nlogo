@@ -201,7 +201,7 @@ end
 ;; ---
 ;; Met à jour la couleur de l'effort de l'agent
 to update-color-effort
-  let temp effort * 100 / effort-max
+  let temp leffort * 100 / effort-max
   set color-effort floor ((100 - temp) / 10) * 10 + 15
 end
 
