@@ -101,18 +101,21 @@ to go
     if partenaire != nobody [
       WorkAgent [leffort] of partenaire
     ]
-    update-color-effort
+    ;update-color-effort
   ]
 
   ask turtles [set leffort effort]
 
-  display-color
+  ;display-color
 
   if ameliorations?
   [
     renouvellement
     change-poste
   ]
+
+  ask turtles [ update-color-effort ]
+  display-color
 
   tick
 end
@@ -616,16 +619,10 @@ to setup-simulate [ liste ]
 
   setup-globals
 
-  RandAgent 0 item 0 liste
-  RandAgent 1 item 1 liste
-  RandAgent 2 item 2 liste
-  RandAgent 3 item 3 liste
-  RandAgent 4 item 4 liste
-  RandAgent 5 item 5 liste
-  RandAgent 6 item 6 liste
-  RandAgent 7 item 7 liste
-  RandAgent 8 item 8 liste
-  RandAgent 9 item 9 liste
+  foreach liste
+  [
+    RandAgent (position ? liste) ?
+  ]
 end
 
 ;; simulate-noise
@@ -965,7 +962,7 @@ INPUTBOX
 122
 192
 nb-agents-0
-200
+0
 1
 0
 Number
@@ -1020,7 +1017,7 @@ INPUTBOX
 281
 191
 nb-agents-5
-100
+5
 1
 0
 Number
@@ -1064,7 +1061,7 @@ INPUTBOX
 279
 587
 nb-agents-9
-0
+956
 1
 0
 Number
@@ -1448,7 +1445,7 @@ min-nb-iterations
 min-nb-iterations
 2
 1000
-200
+1000
 1
 1
 NIL
@@ -1462,8 +1459,8 @@ SLIDER
 max-nb-iterations
 max-nb-iterations
 500
-50000
-50000
+200000
+200000
 100
 1
 NIL
@@ -1590,7 +1587,7 @@ pourcentage-renouvellement
 pourcentage-renouvellement
 0
 100
-0
+10
 1
 1
 %
@@ -1755,7 +1752,7 @@ fire-noise
 fire-noise
 0
 100
-5
+10
 1
 1
 %
