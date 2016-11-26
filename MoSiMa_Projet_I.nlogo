@@ -114,7 +114,7 @@ to go
     change-poste
   ]
 
-  ask turtles [ update-color-effort ]
+  if display-effort [ ask turtles [ update-color-effort ] ]
   display-color
 
   tick
@@ -984,7 +984,7 @@ INPUTBOX
 119
 385
 nb-agents-2
-0
+900
 1
 0
 Number
@@ -995,7 +995,7 @@ INPUTBOX
 118
 487
 nb-agents-3
-0
+1
 1
 0
 Number
@@ -1017,7 +1017,7 @@ INPUTBOX
 281
 191
 nb-agents-5
-5
+0
 1
 0
 Number
@@ -1061,7 +1061,7 @@ INPUTBOX
 279
 587
 nb-agents-9
-956
+0
 1
 0
 Number
