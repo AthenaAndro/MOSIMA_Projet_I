@@ -1,0 +1,28 @@
+"export-plot data (NetLogo 3D 5.3)"
+"MoSiMa_Projet_I.nlogo3d"
+"11/26/2016 10:47:32:026 +0100"
+
+"MODEL SETTINGS"
+"hire-noise","ecart-type-max","nb-agents-8","nb-agents-2","noise?","min-nb-iterations","retraite?","nb-agents-6","hire-method","allowed-step","nb-agents-9","ecart-type-renouvellement","max-nb-iterations","change-poste?","nb-agents-5","neighborhood?","age-retraite","pourcentage-renouvellement","nb-agents-3","nb-agents-1","ameliorations?","fire-noise","noise-value","neighborhood-radius","display-effort","nb-ticks","anciennete-min","change-poste-pourcent","anciennete?","by-ranking?","nb-agents-4","demission-pourcent","anciennete-max","nb-agents-0","nb-agents-7"
+"10","0.1","0","0","false","200","false","0","""Proportion des restants""","1","0","0.1","50000","false","0","false","1000","0","0","0","false","5","1","5","true","1100","10","0","false","false","0","100","400","100","861"
+
+"""Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"""
+"x min","x max","y min","y max","autoplot?","current pen","legend open?","number of pens"
+"0","100","0","2.002","true","""averager""","false","7"
+
+"pen name","pen down?","mode","interval","color","x"
+"""null effort""","true","0","1","5","100"
+"""shrinking effort""","true","0","1","15","100"
+"""replicator""","true","0","1","25","100"
+"""profit comparator""","true","0","1","35","100"
+"""winner imitator""","true","0","1","45","100"
+"""effort comparator""","true","0","1","55","100"
+"""averager""","true","0","1","65","100"
+
+"""null effort""",,,,"""shrinking effort""",,,,"""replicator""",,,,"""profit comparator""",,,,"""winner imitator""",,,,"""effort comparator""",,,,"""averager"""
+"x","y","color","pen down?","x","y","color","pen down?","x","y","color","pen down?","x","y","color","pen down?","x","y","color","pen down?","x","y","color","pen down?","x","y","color","pen down?"
+"0.6","0.01051050988553572","5","true","0.6","0.017955259278246143","15","true","0.6","1.1297413041052249","25","true","0.6","0.010511180938531914","35","true","0.6","2.00099999999998","45","true","0.6","0.010512061400266047","55","true","0.6","1.064009208106806","65","true"
+"5.6","0.11045140478668268","5","true","5.6","0.20160772820174325","15","true","5.6","2.00099999999998","25","true","5.6","0.8247952604935617","35","true","5.6","2.00099999999998","45","true","5.6","0.8120893790813948","55","true","5.6","2.0009999999966226","65","true"
+"33.3","0.6663726326742856","5","true","33.3","0.9746987664864367","15","true","33.3","2.00099999999998","25","true","33.3","1.8816338521371914","35","true","33.3","2.00099999999998","45","true","33.3","1.8889408951872446","55","true","33.3","2.0009986470077945","65","true"
+"66.7","1.3326452653485767","5","true","66.7","1.5980250131088998","15","true","66.7","2.00099999999998","25","true","66.7","1.957225037456906","35","true","66.7","2.00099999999998","45","true","66.7","1.9609078174797268","55","true","66.7","2.000989092339514","65","true"
+"100","2.00099999999998","5","true","100","2.00099999999998","15","true","100","2.00099999999998","25","true","100","2.00099999999998","35","true","100","2.00099999999998","45","true","100","2.00099999999998","55","true","100","2.00099999999998","65","true"

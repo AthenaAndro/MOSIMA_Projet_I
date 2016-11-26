@@ -1,0 +1,25 @@
+"export-plot data (NetLogo 5.3)"
+"MoSiMa_Projet_I.nlogo"
+"11/26/2016 11:48:24:421 +0100"
+
+"MODEL SETTINGS"
+"nb-agents-3","change-poste?","change-poste-pourcent","noise-value","anciennete-min","hire-noise","anciennete?","pourcentage-renouvellement","hire-method","nb-agents-2","display-effort","allowed-step","ameliorations?","nb-agents-1","demission-pourcent","age-retraite","noise?","nb-agents-7","min-nb-iterations","neighborhood?","nb-agents-4","anciennete-max","nb-agents-0","retraite?","nb-agents-5","nb-agents-6","ecart-type-renouvellement","by-ranking?","nb-ticks","fire-noise","max-nb-iterations","nb-agents-8","nb-agents-9","ecart-type-max","neighborhood-radius"
+"0","false","0","1","10","10","false","0","""Proportion des restants""","0","true","1","false","0","100","1000","false","961","200","false","0","400","0","false","0","0","0.1","false","1200","5","50000","0","0","0.01","5"
+
+"""Simulation - Moyenne de l'effort, en fonction du pourcentage d'agents high effort"""
+"x min","x max","y min","y max","autoplot?","current pen","legend open?","number of pens"
+"0","100","0","2.1","true","""average-rational""","false","3"
+
+"pen name","pen down?","mode","interval","color","x"
+"""expected""","true","0","1","5","100"
+"""rational""","true","0","1","15","100"
+"""average-rational""","true","0","1","25","100"
+
+"""expected""",,,,"""rational""",,,,"""average-rational"""
+"x","y","color","pen down?","x","y","color","pen down?","x","y","color","pen down?"
+"0","0.92101","5","true","0","0.9210078746600882","15","true","0","0.9208344562756102","25","true"
+"0.6","0.92701","5","true","0.6","0.9260261375461577","15","true","0.6","0.9254872933691204","25","true"
+"5.6","0.98101","5","true","5.6","0.9707218599433752","15","true","5.6","0.9712270538582362","25","true"
+"33.3","1.281","5","true","33.3","1.2445966069322572","15","true","33.3","1.240958908523971","25","true"
+"66.7","1.641","5","true","66.7","1.6037357211789554","15","true","66.7","1.6031151220337403","25","true"
+"100","2.001","5","true","100","2.00099999999998","15","true","100","2.00099999999998","25","true"

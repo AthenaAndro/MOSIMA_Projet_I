@@ -879,15 +879,22 @@ end
 to print-interface
   export-interface "interface.png"
 end
+
+;; print-view
+;; ---
+;; Exporte la vue (fenêtre des agents) sous forme d'image png
+to print-view
+  export-view "view.png"
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-0
-0
-413
-434
+590
+519
+1058
+1008
 -1
 -1
-13.0
+14.8
 1
 10
 1
@@ -901,8 +908,6 @@ GRAPHICS-WINDOW
 30
 0
 30
-0
-0
 1
 1
 1
@@ -910,10 +915,10 @@ ticks
 30.0
 
 BUTTON
-34
-683
-262
-808
+19
+597
+247
+722
 NIL
 setup
 NIL
@@ -927,10 +932,10 @@ NIL
 1
 
 BUTTON
-270
-682
-495
-808
+255
+596
+480
+722
 NIL
 go
 T
@@ -960,7 +965,7 @@ INPUTBOX
 122
 192
 nb-agents-0
-100
+0
 1
 0
 Number
@@ -1037,7 +1042,7 @@ INPUTBOX
 278
 384
 nb-agents-7
-861
+961
 1
 0
 Number
@@ -1084,10 +1089,10 @@ PENS
 "Ecart-Type " 1.0 0 -16777216 true "" "plot standard-deviation [leffort] of turtles"
 
 PLOT
-1143
-521
-1520
-826
+1134
+519
+1511
+824
 Profit Moyen
 time
 profit
@@ -1170,10 +1175,10 @@ noise-value
 HORIZONTAL
 
 MONITOR
-1221
-470
-1322
-515
+1134
+824
+1235
+869
 Profit Moyen
 mean [profit] of turtles
 5
@@ -1202,7 +1207,7 @@ Effort Moyen
 0.0
 100.0
 0.0
-2.002
+2.1
 true
 true
 "" ""
@@ -1236,10 +1241,10 @@ Simulations
 1
 
 PLOT
-589
-520
-1133
-827
+1134
+211
+1678
+518
 Ecart-type effort selon type d'agent
 Time
 Ecart-Type de l'Effort
@@ -1424,10 +1429,10 @@ standard-deviation [leffort] of turtles
 11
 
 MONITOR
-1326
-470
-1444
-515
+1239
+824
+1357
+869
 Ecart-type Profit
 standard-deviation [profit] of turtles
 5
@@ -1443,7 +1448,7 @@ min-nb-iterations
 min-nb-iterations
 2
 1000
-50
+200
 1
 1
 NIL
@@ -1473,7 +1478,7 @@ ecart-type-max
 ecart-type-max
 0.001
 0.5
-0.02
+0.01
 0.001
 1
 NIL
@@ -1507,7 +1512,7 @@ Effort
 0.0
 10.0
 0.0
-2.002
+2.1
 true
 true
 "" ""
@@ -1549,27 +1554,27 @@ nb-ticks
 nb-ticks
 100
 10000
-1100
+1200
 100
 1
 NIL
 HORIZONTAL
 
 TEXTBOX
-20
-849
-170
-873
+28
+981
+178
+1005
 Améliorations
 18
 0.0
 1
 
 SWITCH
-23
-880
-185
-913
+31
+1012
+193
+1045
 ameliorations?
 ameliorations?
 1
@@ -1577,10 +1582,10 @@ ameliorations?
 -1000
 
 SLIDER
-367
-911
-651
-944
+375
+1043
+659
+1076
 pourcentage-renouvellement
 pourcentage-renouvellement
 0
@@ -1592,10 +1597,10 @@ pourcentage-renouvellement
 HORIZONTAL
 
 SLIDER
-653
-912
-900
-945
+661
+1044
+908
+1077
 ecart-type-renouvellement
 ecart-type-renouvellement
 0.001
@@ -1607,10 +1612,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-24
-944
-163
-989
+32
+1076
+171
+1121
 #null effort
 count turtles with [agent-type = 0]
 17
@@ -1618,10 +1623,10 @@ count turtles with [agent-type = 0]
 11
 
 MONITOR
-24
-988
-163
-1033
+32
+1120
+171
+1165
 #shrinking effort
 count turtles with [agent-type = 1]
 17
@@ -1629,10 +1634,10 @@ count turtles with [agent-type = 1]
 11
 
 MONITOR
-24
-1031
-163
-1076
+32
+1163
+171
+1208
 #replicator
 count turtles with [agent-type = 2]
 17
@@ -1640,10 +1645,10 @@ count turtles with [agent-type = 2]
 11
 
 MONITOR
-24
-1075
-163
-1120
+32
+1207
+171
+1252
 #rational
 count turtles with [agent-type = 3]
 17
@@ -1651,10 +1656,10 @@ count turtles with [agent-type = 3]
 11
 
 MONITOR
-24
-1120
-163
-1165
+32
+1252
+171
+1297
 #profit comparator
 count turtles with [agent-type = 4]
 17
@@ -1662,10 +1667,10 @@ count turtles with [agent-type = 4]
 11
 
 MONITOR
-182
-943
-321
-988
+190
+1075
+329
+1120
 #high effort
 count turtles with [agent-type = 5]
 17
@@ -1673,10 +1678,10 @@ count turtles with [agent-type = 5]
 11
 
 MONITOR
-182
-985
-321
-1030
+190
+1117
+329
+1162
 #average rational
 count turtles with [agent-type = 6]
 17
@@ -1684,10 +1689,10 @@ count turtles with [agent-type = 6]
 11
 
 MONITOR
-182
-1031
-320
-1076
+190
+1163
+328
+1208
 #winner imitator
 count turtles with [agent-type = 7]
 17
@@ -1695,10 +1700,10 @@ count turtles with [agent-type = 7]
 11
 
 MONITOR
-181
-1076
-321
-1121
+189
+1208
+329
+1253
 #effort comparator
 count turtles with [agent-type = 8]
 17
@@ -1706,10 +1711,10 @@ count turtles with [agent-type = 8]
 11
 
 MONITOR
-181
-1120
-321
-1165
+189
+1252
+329
+1297
 #averager
 count turtles with [agent-type = 9]
 17
@@ -1717,20 +1722,20 @@ count turtles with [agent-type = 9]
 11
 
 CHOOSER
-545
-952
-890
-997
+553
+1084
+898
+1129
 hire-method
 hire-method
 "Aleatoire" "Proportion des restants"
 1
 
 SLIDER
-364
-956
-536
-989
+372
+1088
+544
+1121
 hire-noise
 hire-noise
 0
@@ -1742,10 +1747,10 @@ hire-noise
 HORIZONTAL
 
 SLIDER
-363
-999
-535
-1032
+371
+1131
+543
+1164
 fire-noise
 fire-noise
 0
@@ -1757,10 +1762,10 @@ fire-noise
 HORIZONTAL
 
 SLIDER
-368
-1153
-540
-1186
+376
+1285
+548
+1318
 anciennete-min
 anciennete-min
 0
@@ -1772,10 +1777,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-368
-1188
-540
-1221
+376
+1320
+548
+1353
 anciennete-max
 anciennete-max
 0
@@ -1787,10 +1792,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-367
-1116
-496
-1149
+375
+1248
+504
+1281
 anciennete?
 anciennete?
 1
@@ -1798,10 +1803,10 @@ anciennete?
 -1000
 
 SWITCH
-626
-1119
-729
-1152
+634
+1251
+737
+1284
 retraite?
 retraite?
 1
@@ -1809,10 +1814,10 @@ retraite?
 -1000
 
 SLIDER
-626
-1154
-798
-1187
+634
+1286
+806
+1319
 age-retraite
 age-retraite
 300
@@ -1824,10 +1829,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-627
-1190
-844
-1223
+635
+1322
+852
+1355
 demission-pourcent
 demission-pourcent
 0
@@ -1839,10 +1844,10 @@ demission-pourcent
 HORIZONTAL
 
 SWITCH
-912
-1112
-1076
-1145
+920
+1244
+1084
+1277
 change-poste?
 change-poste?
 1
@@ -1850,10 +1855,10 @@ change-poste?
 -1000
 
 SLIDER
-912
-1150
-1200
-1183
+920
+1282
+1208
+1315
 change-poste-pourcent
 change-poste-pourcent
 0
@@ -1865,10 +1870,10 @@ change-poste-pourcent
 HORIZONTAL
 
 SWITCH
-911
-1192
-1031
-1225
+919
+1324
+1039
+1357
 by-ranking?
 by-ranking?
 1
@@ -1876,60 +1881,60 @@ by-ranking?
 -1000
 
 TEXTBOX
-364
-882
-678
-902
+372
+1014
+686
+1034
 \"Renouvellement\" des moins bons éléments
 14
 0.0
 1
 
 TEXTBOX
-367
-1058
-517
-1092
+375
+1190
+525
+1224
 Prise en compte de l'ancienneté
 14
 0.0
 1
 
 TEXTBOX
-625
-1057
-844
-1115
+633
+1189
+852
+1247
 Prise en compte de départs à la retraites et de démissions spontanées
 14
 0.0
 1
 
 TEXTBOX
-913
-1053
-1063
-1104
+921
+1185
+1071
+1236
 Changement de type selon rapport profit/effort
 14
 0.0
 1
 
 TEXTBOX
-981
-885
-1131
-903
+989
+1017
+1139
+1035
 Voisinage
 14
 0.0
 1
 
 SWITCH
-971
-911
-1122
-944
+979
+1043
+1130
+1076
 neighborhood?
 neighborhood?
 1
@@ -1937,10 +1942,10 @@ neighborhood?
 -1000
 
 SLIDER
-972
-957
-1160
-990
+980
+1089
+1168
+1122
 neighborhood-radius
 neighborhood-radius
 1
@@ -1952,12 +1957,29 @@ NIL
 HORIZONTAL
 
 BUTTON
-26
-1188
-341
-1353
-Capture d'écran
+20
+749
+246
+876
+Capture d'écran interface
 print-interface
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+258
+749
+484
+874
+Capture d'écran de la vue
+print-view
 NIL
 1
 T
@@ -2311,7 +2333,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 3D 5.3
+NetLogo 5.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
