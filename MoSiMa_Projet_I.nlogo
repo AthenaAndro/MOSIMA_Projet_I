@@ -905,8 +905,8 @@ end
 GRAPHICS-WINDOW
 590
 519
-836
-786
+1058
+1008
 -1
 -1
 14.8
@@ -920,9 +920,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-15
+30
 0
-15
+30
 1
 1
 1
@@ -970,7 +970,7 @@ SWITCH
 120
 display-effort
 display-effort
-0
+1
 1
 -1000
 
@@ -980,7 +980,7 @@ INPUTBOX
 122
 192
 nb-agents-0
-0
+481
 1
 0
 Number
@@ -991,7 +991,7 @@ INPUTBOX
 120
 287
 nb-agents-1
-0
+480
 1
 0
 Number
@@ -1024,7 +1024,7 @@ INPUTBOX
 118
 589
 nb-agents-4
-242
+0
 1
 0
 Number
@@ -1035,7 +1035,7 @@ INPUTBOX
 281
 191
 nb-agents-5
-14
+0
 1
 0
 Number
@@ -1592,7 +1592,7 @@ SWITCH
 1089
 ameliorations?
 ameliorations?
-1
+0
 1
 -1000
 
@@ -1605,7 +1605,7 @@ pourcentage-renouvellement
 pourcentage-renouvellement
 0
 100
-1
+12
 1
 1
 %
@@ -1755,7 +1755,7 @@ hire-noise
 hire-noise
 0
 100
-10
+18
 1
 1
 %
