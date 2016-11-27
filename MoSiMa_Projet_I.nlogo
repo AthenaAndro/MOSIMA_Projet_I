@@ -473,7 +473,7 @@ to simulate-fig6
   let tampon []
 
   ;; Initialisation de la liste des pourcentages de high effort dans la population de la simulation
-  let liste-pourcentages (list 0.6 5.6 33.3 66.7 100)
+  let liste-pourcentages (list 0 0.6 5.6 33.3 66.7 100)
 
   ;; Lancement des simulations pour les types d'agents voulus (rational et average rational)
   let liste-plot-null launch-simulations-figs liste-pourcentages 0
@@ -531,25 +531,35 @@ end
 ;; core-simulate
 ;; ---
 ;; Effectue la simulation tant que l'écart-type des 200 dernières itérations n'est pas inférieur à la précision voulue : ecart-type-max
-to core-simulate
-  let counter 0
+to-report core-simulate
   let tampon (list (mean [leffort] of turtles) )
+  go-simulate
+  set tampon lput (mean [leffort] of turtles) tampon
+
+  let counter 2
   ;; • Au moins min-nb-iterations itération
   ;; • Tant que la moyenne de la moyenne des efforts des agents durant min-nb-iterations dernières itérations
   ;; • est supérieure à ecart-type-max
   ;; • Au plus max-nb-iterations itérations
   while [ (counter < min-nb-iterations or standard-deviation tampon > ecart-type-max) and counter < max-nb-iterations ]
-    [
-      go-simulate
-      ifelse counter > min-nb-iterations
+  [
+    go-simulate
+    ifelse counter > min-nb-iterations
       [
         set tampon lput (mean [leffort] of turtles) tampon
       ]
       [
-        set tampon remove 0 (lput (mean [leffort] of turtles) tampon)
+        set tampon lput (mean [leffort] of turtles) but-first tampon
+        ;set tampon remove 0 (lput (mean [leffort] of turtles) tampon)
       ]
-      set counter counter + 1
-    ]
+    set counter counter + 1
+  ]
+
+  ;; Récupération de la valeur à retourner, selon si on a trouvé un équilibre ou non
+  let res 0
+  ifelse counter >= max-nb-iterations
+  [ set res mean tampon ]
+  [ set res last tampon ]
 
   let others turtles with [agent-type != 5]
   ifelse any? others
@@ -557,7 +567,9 @@ to core-simulate
     show (word "Simulation d'agents de type " other-type " avec " ((count turtles with [agent-type = 5] / count turtles) * 100) " % de high effort") ]
   [ show (word "Simulation avec 100 % de high effort") ]
   show (word "Nombre d'itération " counter)
-  show (word "Moyenne d'effort fourni par les agents : " (mean [leffort] of turtles))
+  show (word "Moyenne d'effort fourni par les agents : " res)
+
+  report res
 end
 
 ;; launch-simulations-figs
@@ -579,10 +591,16 @@ to-report launch-simulations-figs [ liste-pourcentages type-agent ]
     foreach [ 0 1 2 3 4 5 6 7 8 9 ]
     [
       ifelse ? = type-agent
-      [ set liste-nb-agents lput (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) liste-nb-agents ]
+      [
+        ;set liste-nb-agents lput (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) liste-nb-agents
+        set liste-nb-agents lput (((max-pxcor) * (max-pycor)) - floor (((max-pxcor) * (max-pycor)) * pourcentage / 100 )) liste-nb-agents
+      ]
       [
         ifelse ? = 5
-        [ set liste-nb-agents lput (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) liste-nb-agents ]
+        [
+          ;set liste-nb-agents lput (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) liste-nb-agents
+          set liste-nb-agents lput (floor (((max-pxcor) * (max-pycor)) * pourcentage / 100 )) liste-nb-agents
+        ]
         [ set liste-nb-agents lput 0 liste-nb-agents ]
       ]
     ]
@@ -597,13 +615,13 @@ to-report launch-simulations-figs [ liste-pourcentages type-agent ]
     setup-simulate liste-nb-agents
 
     ;; Lancement de la simulation
-    core-simulate
+    let result core-simulate
+
+    ;; Ajout du resultat à la liste
+    set liste-resultats lput (list ? result ) liste-resultats
 
     ;; Réactivation du bruit
     set noise? temp-noise
-
-    ;; Ajout du resultat à la liste
-    set liste-resultats lput (list ? (mean [effort] of turtles) ) liste-resultats
   ]
   report liste-resultats
 end
@@ -962,7 +980,7 @@ INPUTBOX
 122
 192
 nb-agents-0
-0
+1
 1
 0
 Number
@@ -984,7 +1002,7 @@ INPUTBOX
 119
 385
 nb-agents-2
-900
+0
 1
 0
 Number
@@ -995,7 +1013,7 @@ INPUTBOX
 118
 487
 nb-agents-3
-1
+959
 1
 0
 Number
@@ -1017,7 +1035,7 @@ INPUTBOX
 281
 191
 nb-agents-5
-0
+1
 1
 0
 Number
@@ -1444,7 +1462,7 @@ SLIDER
 min-nb-iterations
 min-nb-iterations
 2
-1000
+10000
 1000
 1
 1
@@ -1460,7 +1478,7 @@ max-nb-iterations
 max-nb-iterations
 500
 200000
-200000
+100000
 100
 1
 NIL
@@ -1475,7 +1493,7 @@ ecart-type-max
 ecart-type-max
 0.001
 0.5
-0.01
+0.001
 0.001
 1
 NIL
@@ -1587,7 +1605,7 @@ pourcentage-renouvellement
 pourcentage-renouvellement
 0
 100
-10
+4
 1
 1
 %
@@ -1834,7 +1852,7 @@ demission-pourcent
 demission-pourcent
 0
 100
-100
+63
 1
 1
 %
@@ -2330,7 +2348,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.3
+NetLogo 5.3.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
