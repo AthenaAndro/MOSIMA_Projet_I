@@ -541,10 +541,10 @@ to-report core-simulate
   ;; • Tant que la moyenne de la moyenne des efforts des agents durant min-nb-iterations dernières itérations
   ;; • est supérieure à ecart-type-max
   ;; • Au plus max-nb-iterations itérations
-  while [ (counter < min-nb-iterations or standard-deviation tampon > ecart-type-max) and counter < max-nb-iterations ]
+  while [ (counter < 1000 or standard-deviation tampon != 0) and (counter < min-nb-iterations or standard-deviation tampon > ecart-type-max) and counter < max-nb-iterations ]
   [
     go-simulate
-    ifelse counter > min-nb-iterations
+    ifelse counter < min-nb-iterations
       [
         set tampon lput (mean [leffort] of turtles) tampon
       ]
@@ -558,15 +558,15 @@ to-report core-simulate
   ;; Récupération de la valeur à retourner, selon si on a trouvé un équilibre ou non
   let res 0
   ifelse counter >= max-nb-iterations
-  [ set res mean tampon ]
-  [ set res last tampon ]
+  [ set res mean tampon ] ;; Si on est arrivé au nombre maximal d'itérations, il est très probable qu'on n'a pas atteint l'équilibre, on renvoie donc la moyenne des dernières itérations
+  [ set res last tampon ] ;; Sinon c'est qu'on est arrivé à l'équilibre, on renvoie donc la dernière valeur obtenue
 
   let others turtles with [agent-type != 5]
   ifelse any? others
   [ let other-type [agent-type] of one-of others
     show (word "Simulation d'agents de type " other-type " avec " ((count turtles with [agent-type = 5] / count turtles) * 100) " % de high effort") ]
   [ show (word "Simulation avec 100 % de high effort") ]
-  show (word "Nombre d'itération " counter)
+  show (word "Nombre d'itération : " counter " avec ecart-type du tampon : " standard-deviation tampon)
   show (word "Moyenne d'effort fourni par les agents : " res)
 
   report res
@@ -970,7 +970,7 @@ SWITCH
 120
 display-effort
 display-effort
-0
+1
 1
 -1000
 
@@ -980,7 +980,7 @@ INPUTBOX
 122
 192
 nb-agents-0
-1
+0
 1
 0
 Number
@@ -1013,7 +1013,7 @@ INPUTBOX
 118
 487
 nb-agents-3
-959
+0
 1
 0
 Number
@@ -1079,7 +1079,7 @@ INPUTBOX
 279
 587
 nb-agents-9
-0
+960
 1
 0
 Number
@@ -1491,8 +1491,8 @@ SLIDER
 1483
 ecart-type-max
 ecart-type-max
-0.001
-0.5
+0
+0.1
 0.001
 0.001
 1
@@ -1605,7 +1605,7 @@ pourcentage-renouvellement
 pourcentage-renouvellement
 0
 100
-4
+1
 1
 1
 %
@@ -1620,7 +1620,7 @@ ecart-type-renouvellement
 ecart-type-renouvellement
 0.001
 2
-0.1
+0.01
 0.001
 1
 NIL
@@ -1770,7 +1770,7 @@ fire-noise
 fire-noise
 0
 100
-10
+1
 1
 1
 %
