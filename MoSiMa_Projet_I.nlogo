@@ -541,7 +541,7 @@ to-report core-simulate
   ;; • Tant que la moyenne de la moyenne des efforts des agents durant min-nb-iterations dernières itérations
   ;; • est supérieure à ecart-type-max
   ;; • Au plus max-nb-iterations itérations
-  while [ (counter < 1000 or standard-deviation tampon != 0) and (counter < min-nb-iterations or standard-deviation tampon > ecart-type-max) and counter < max-nb-iterations ]
+  while [ (counter < min-nb-iterations or standard-deviation tampon > ecart-type-max) and counter < max-nb-iterations ]
   [
     go-simulate
     ifelse counter < min-nb-iterations
@@ -592,14 +592,14 @@ to-report launch-simulations-figs [ liste-pourcentages type-agent ]
     [
       ifelse ? = type-agent
       [
-        ;set liste-nb-agents lput (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) liste-nb-agents
-        set liste-nb-agents lput (((max-pxcor) * (max-pycor)) - floor (((max-pxcor) * (max-pycor)) * pourcentage / 100 )) liste-nb-agents
+        set liste-nb-agents lput (((max-pxcor + 1) * (max-pycor + 1)) - floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) liste-nb-agents
+        ;set liste-nb-agents lput (((max-pxcor) * (max-pycor)) - floor (((max-pxcor) * (max-pycor)) * pourcentage / 100 )) liste-nb-agents
       ]
       [
         ifelse ? = 5
         [
-          ;set liste-nb-agents lput (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) liste-nb-agents
-          set liste-nb-agents lput (floor (((max-pxcor) * (max-pycor)) * pourcentage / 100 )) liste-nb-agents
+          set liste-nb-agents lput (floor (((max-pxcor + 1) * (max-pycor + 1)) * pourcentage / 100 )) liste-nb-agents
+          ;set liste-nb-agents lput (floor (((max-pxcor) * (max-pycor)) * pourcentage / 100 )) liste-nb-agents
         ]
         [ set liste-nb-agents lput 0 liste-nb-agents ]
       ]
@@ -905,8 +905,8 @@ end
 GRAPHICS-WINDOW
 590
 519
-1058
-1008
+836
+786
 -1
 -1
 14.8
@@ -920,9 +920,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-30
+15
 0
-30
+15
 1
 1
 1
@@ -970,7 +970,7 @@ SWITCH
 120
 display-effort
 display-effort
-1
+0
 1
 -1000
 
@@ -1024,7 +1024,7 @@ INPUTBOX
 118
 589
 nb-agents-4
-0
+242
 1
 0
 Number
@@ -1035,7 +1035,7 @@ INPUTBOX
 281
 191
 nb-agents-5
-1
+14
 1
 0
 Number
@@ -1079,7 +1079,7 @@ INPUTBOX
 279
 587
 nb-agents-9
-960
+0
 1
 0
 Number
@@ -1478,7 +1478,7 @@ max-nb-iterations
 max-nb-iterations
 500
 200000
-100000
+20000
 100
 1
 NIL
